@@ -6,6 +6,13 @@
 <title>Gorge Bowl</title>
 <meta name="description" content="Today's soup at lunch spots around the Columbia River Gorge.">
 <meta name="theme-color" content="#1f3a2b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gorge Bowl">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap">
 <style>
@@ -33,15 +40,22 @@ header .wrap{padding-block:22px 0;display:grid;gap:14px}
 .brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,7vw,44px);line-height:1;margin:0;letter-spacing:-.02em}
 .brand p{margin:6px 0 0;opacity:.85;font-size:15px}
+.title{display:flex;align-items:center;gap:12px}
+.mark{width:clamp(44px,11vw,60px);height:auto;flex:none}
+html{-webkit-text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent}
+button,.snapbtn,.chip{touch-action:manipulation}
 .stripes{display:flex;height:6px}
 .stripes span{flex:1;transition:background-color .8s ease}
 .stripes span:nth-child(1){background:var(--a2)}
 .stripes span:nth-child(2){background:var(--a1)}
 .stripes span:nth-child(3){background:var(--a3)}
 
-.seasons{display:flex;gap:6px;flex-wrap:wrap}
-.seasons button{font:600 12px var(--font-body);letter-spacing:.06em;text-transform:uppercase;border:1px solid color-mix(in srgb,var(--band-ink) 40%,transparent);background:transparent;color:var(--band-ink);padding:6px 10px;border-radius:999px;cursor:pointer}
-.seasons button[aria-pressed="true"]{background:var(--band-ink);color:var(--band)}
+.seasons{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.seasons span{font-size:12px;color:var(--ink-soft);margin-right:2px}
+.seasons button{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);background:transparent;color:var(--ink-soft);padding:5px 9px;border-radius:999px;cursor:pointer}
+.seasons button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.foot{display:grid;gap:12px}
 
 nav.tabs{display:flex;gap:4px}
 nav.tabs button{font:700 15px var(--font-display);background:transparent;border:0;color:var(--band-ink);opacity:.7;padding:10px 14px 12px;cursor:pointer;border-radius:10px 10px 0 0}
@@ -57,7 +71,7 @@ main .wrap{padding-block:22px 48px;display:grid;gap:22px}
 
 .list{display:grid;gap:10px}
 .soup{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:2px;transition:background-color .8s ease,border-color .8s ease}
-.where{font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.where{font-weight:600;font-size:14px;display:grid;gap:0}
 .where small{font-weight:400;color:var(--ink-soft);font-size:12px}
 .where a{color:var(--ink-soft);font-weight:500;font-size:12px}
 .soup h3{margin:0;font-family:var(--font-display);font-size:24px;font-weight:700;line-height:1.2}
@@ -135,15 +149,12 @@ footer{color:var(--ink-soft);font-size:12px}
 <header>
   <div class="wrap">
     <div class="brand">
-      <div>
-        <h1>Gorge Bowl</h1>
-        <p>Soups around the Gorge</p>
-      </div>
-      <div class="seasons" role="group" aria-label="Season colors">
-        <button type="button" data-s="fall">Fall</button>
-        <button type="button" data-s="winter">Winter</button>
-        <button type="button" data-s="spring">Spring</button>
-        <button type="button" data-s="summer">Summer</button>
+      <div class="title">
+        <img class="mark" src="icons/mark.svg" alt="" width="56" height="56">
+        <div>
+          <h1>Gorge Bowl</h1>
+          <p>Soups around the Gorge</p>
+        </div>
       </div>
     </div>
     <nav class="tabs" role="tablist">
@@ -251,7 +262,16 @@ footer{color:var(--ink-soft);font-size:12px}
       </div>
     </section>
 
-    <footer id="footNote">Early version.</footer>
+    <footer class="foot">
+      <span id="footNote">Early version.</span>
+      <div class="seasons" role="group" aria-label="Preview season colors">
+        <span>Preview colors:</span>
+        <button type="button" data-s="fall">Fall</button>
+        <button type="button" data-s="winter">Winter</button>
+        <button type="button" data-s="spring">Spring</button>
+        <button type="button" data-s="summer">Summer</button>
+      </div>
+    </footer>
   </div>
 </main>
 
@@ -292,8 +312,10 @@ function saveLocal(){
 async function api(path, body){
   const headers = {"apikey": DB_KEY, "Content-Type": "application/json"};
   if (DB_KEY.startsWith("eyJ")) headers["Authorization"] = "Bearer " + DB_KEY;
-  const res = await fetch(DB_URL.replace(/\/+$/, "") + "/rest/v1/" + path, {
-    method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
+  let res;
+  try { res = await fetch(DB_URL.replace(/\/+$/, "") + "/rest/v1/" + path, {
+    method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined }); }
+  catch(e){ throw new Error("Couldn't reach the soup database."); }
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error((data && (data.message || data.hint)) || "Couldn't reach the soup database.");
   return data;
