@@ -1,13 +1,15 @@
-# Gorge Soup & Tunes (prototype)
+# Gorge Bowl
 
-A clickable prototype of a Columbia Gorge app: today's soup at each lunch spot, and tonight's live music and events.
+Soups around the Gorge: today's soup at lunch spots from Hood River to The Dalles.
 
-Open `index.html` in any browser. Everything in it is sample data, and nothing saves.
+Open `index.html` in a browser, or visit the GitHub Pages link once Pages is turned on.
 
-What it shows:
-- **Soup today**: restaurant, soup, and any special. Tag for restaurant posts vs. customer posts, a one-tap ✓ to confirm, and "Different soup?" to fix it (soup name only, no comments).
-- **Tonight**: events gathered from several sources and merged into one listing.
-- **Post a soup**: staff or customers post by typing or snapping a photo of the board; "+ Add a restaurant" adds a new spot.
-- **Daily reminder**: each restaurant gets a morning text or email and replies with the soup.
-- **Monthly drawing**: each post or check is an entry.
+What works now:
+- **Soup today**: each restaurant's soup and any special, with a Map link, a tag for restaurant vs. customer posts, and a one-tap ✓ to confirm. Customers can fix a customer-posted soup; a restaurant's own post can't be changed by customers. No comments or reviews.
+- **Add a restaurant**: search places around the Gorge (free OpenStreetMap search) and tap the right one; it links to Google Maps. If a place isn't found, add it by name and town.
 - **Seasonal colors**: fall, winter, spring and summer palettes switch by date.
+
+Not yet:
+- Restaurants and soups are saved on each device only, so other people don't see them yet. A shared database is the next step.
+- Reading the soup off a photo of the board, and the daily text/email reminder, are shown but not working yet.
+- The events/music tab is parked for later.

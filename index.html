@@ -3,39 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gorge Soup &amp; Tunes</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<title>Gorge Bowl</title>
+<meta name="description" content="Today's soup at lunch spots around the Columbia River Gorge.">
+<meta name="theme-color" content="#1f3a2b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap">
 <style>
-/* Layout: a pine "backdrop" band frames a light seasonal ground; two tabs (Soup / Tonight) plus a staff posting panel. Ink stays black; only the color world changes with the season. Deliberately single-theme. */
+/* Layout: a pine band frames a light seasonal ground. Ink stays black; only the color world changes with the season. */
 :root{
   color-scheme: light;
-  --ink:#141414;
-  --ink-soft:#4a4a44;
-  --font-display:"Bricolage Grotesque", "Inter", system-ui, sans-serif;
-  --font-body:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* Fall (default) */
+  --ink:#141414; --ink-soft:#4a4a44;
+  --font-display:"Bricolage Grotesque","Inter",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   --band:#1f3a2b; --band-ink:#f7ecd6;
   --ground:#f6e6cb; --card:#fffaf1; --line:#e2c9a0;
-  --a1:#d9622b; --a2:#b3261e; --a3:#e8b23a;
+  --a1:#c4561f; --a2:#b3261e; --a3:#e8b23a;
 }
-body[data-season="winter"]{ --band:#24425a; --band-ink:#f4f9fc; --ground:#edf4f9; --card:#ffffff; --line:#c9dbe8; --a1:#5d9ccc; --a2:#2f6f9f; --a3:#bcd9ee; }
-body[data-season="spring"]{ --band:#35603a; --band-ink:#fff7f5; --ground:#fcf0ee; --card:#fffdfb; --line:#efcfd2; --a1:#d63b2a; --a2:#f0be2c; --a3:#f2a9b9; }
-body[data-season="summer"]{ --band:#2a6c8c; --band-ink:#fbfdff; --ground:#eef7fb; --card:#ffffff; --line:#cfe3ec; --a1:#f0874a; --a2:#5f9e46; --a3:#f6c65c; }
+body[data-season="winter"]{ --band:#24425a; --band-ink:#f4f9fc; --ground:#edf4f9; --card:#ffffff; --line:#c9dbe8; --a1:#2f6f9f; --a2:#24425a; --a3:#bcd9ee; }
+body[data-season="spring"]{ --band:#35603a; --band-ink:#fff7f5; --ground:#fcf0ee; --card:#fffdfb; --line:#efcfd2; --a1:#c8331f; --a2:#f0be2c; --a3:#f2a9b9; }
+body[data-season="summer"]{ --band:#2a6c8c; --band-ink:#fbfdff; --ground:#eef7fb; --card:#ffffff; --line:#cfe3ec; --a1:#d2692b; --a2:#5f9e46; --a3:#f6c65c; }
 
 *{box-sizing:border-box}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;transition:background-color .8s ease}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--band)}
-.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;transition:background-color .8s ease;padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-header{background:var(--band);color:var(--band-ink);transition:background-color .8s ease}
+header{background:var(--band);color:var(--band-ink);transition:background-color .8s ease;padding-top:env(safe-area-inset-top,0px)}
 header .wrap{padding-block:22px 0;display:grid;gap:14px}
 .brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand h1{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,6vw,42px);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
-.brand h1 .amp{color:var(--a3)}
-.brand p{margin:6px 0 0;opacity:.85;font-size:14px}
-.stripes{display:flex;height:6px;gap:0}
+.brand h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,7vw,44px);line-height:1;margin:0;letter-spacing:-.02em}
+.brand p{margin:6px 0 0;opacity:.85;font-size:15px}
+.stripes{display:flex;height:6px}
 .stripes span{flex:1;transition:background-color .8s ease}
 .stripes span:nth-child(1){background:var(--a2)}
 .stripes span:nth-child(2){background:var(--a1)}
@@ -48,83 +46,76 @@ header .wrap{padding-block:22px 0;display:grid;gap:14px}
 nav.tabs{display:flex;gap:4px}
 nav.tabs button{font:700 15px var(--font-display);background:transparent;border:0;color:var(--band-ink);opacity:.7;padding:10px 14px 12px;cursor:pointer;border-radius:10px 10px 0 0}
 nav.tabs button[aria-selected="true"]{background:var(--ground);color:var(--ink);opacity:1}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--a1);outline-offset:2px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--a1);outline-offset:2px}
 
 main .wrap{padding-block:22px 48px;display:grid;gap:22px}
-.daybar{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stack{display:grid;gap:14px}
 .daybar h2{font-family:var(--font-display);font-size:24px;margin:0;font-weight:700}
-.daybar .meta{color:var(--ink-soft);font-size:13px}
-.sample{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--a3);color:var(--ink);padding:3px 8px;border-radius:4px}
-
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .chip{font:500 13px var(--font-body);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--card)}
 
 .list{display:grid;gap:10px}
 .soup{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:2px;transition:background-color .8s ease,border-color .8s ease}
-.soup .where{font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.soup .where small{font-weight:400;color:var(--ink-soft);font-size:12px}
+.where{font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.where small{font-weight:400;color:var(--ink-soft);font-size:12px}
+.where a{color:var(--ink-soft);font-weight:500;font-size:12px}
 .soup h3{margin:0;font-family:var(--font-display);font-size:24px;font-weight:700;line-height:1.2}
+.soup h3.none{font-size:16px;font-weight:500;color:var(--ink-soft);font-family:var(--font-body)}
 .special{font-size:14px;color:var(--ink-soft);margin-top:4px}
 .special b{font-weight:600;color:var(--ink)}
-.snap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.snap input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
-.snapbtn{font:700 15px var(--font-display)!important;text-transform:none!important;letter-spacing:0!important;background:var(--band-ink);color:var(--band);border-radius:8px;padding:11px 16px;cursor:pointer;display:inline-block!important}
-.snap input[type=file]:focus-visible + img, .snap input[type=file]:focus-visible ~ span{outline:none}
-.snap:focus-within .snapbtn{outline:3px solid var(--a1);outline-offset:2px}
-#pPreview{width:72px;height:72px;object-fit:cover;border-radius:8px;max-width:100%}
-#snapNote{font-size:13px;opacity:.85}
-.remind{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:20px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.remind h2{margin:0 0 6px;font-family:var(--font-display);font-size:21px}
-.remind p{margin:0 0 14px;color:var(--ink-soft);font-size:14px;max-width:52ch}
-.rfields{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;max-width:300px}
-.rfields label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-.rdays{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:12px}
-.rdays input{width:auto}
-.phone{background:var(--ground);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px}
-.phead{font-size:12px;color:var(--ink-soft);text-align:center}
-.bubble{font-size:14px;padding:8px 12px;border-radius:14px;max-width:88%;line-height:1.4}
-.bubble.in{background:var(--card);border:1px solid var(--line);justify-self:start}
-.bubble.out{background:var(--band);color:var(--band-ink);justify-self:end}
-@media (max-width:600px){.remind{grid-template-columns:1fr}}
 .verify{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}
 .who{font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--line);color:var(--ink-soft)}
 .who.restaurant{background:var(--a1);border-color:var(--a1);color:#fff}
 .check{font:600 13px var(--font-body);border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
 .check[aria-pressed="true"]{background:var(--ink);color:var(--card)}
-.diff{font:500 13px var(--font-body);background:none;border:0;color:var(--ink-soft);text-decoration:underline;cursor:pointer;padding:4px}
+.link{font:500 13px var(--font-body);background:none;border:0;color:var(--ink-soft);text-decoration:underline;cursor:pointer;padding:4px}
 .fix{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .fix input{flex:1;min-width:0}
-.fix button{font:700 14px var(--font-display);background:var(--a1);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn{font:700 15px var(--font-display);background:var(--a1);color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:22px 18px;display:grid;gap:10px;justify-items:start}
+.empty h3{margin:0;font-family:var(--font-display);font-size:20px}
+.empty p{margin:0;color:var(--ink-soft);max-width:52ch}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.draw{display:flex;justify-content:space-between;gap:10px 16px;align-items:center;flex-wrap:wrap;border:2px dashed var(--a1);border-radius:12px;padding:12px 16px;font-size:14px}
-.draw .count{white-space:nowrap}
-.newrest{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.addline{margin:0;font-size:14px}
-.addline .diff{color:var(--ink);font-weight:600}
-@media (max-width:600px){.newrest{grid-template-columns:1fr}}
-
-.event{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:72px 1fr;gap:14px;transition:background-color .8s ease}
-.event time{font-family:var(--font-display);font-weight:800;font-size:20px;line-height:1.1;font-variant-numeric:tabular-nums}
-.event time small{display:block;font:500 12px var(--font-body);color:var(--ink-soft)}
-.event h3{margin:0;font-family:var(--font-display);font-size:19px;font-weight:700;line-height:1.2}
-.event .venue{font-weight:600;font-size:14px}
-.event p{margin:4px 0 0;color:var(--ink-soft);font-size:14px;max-width:60ch}
-.sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.src{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;background:color-mix(in srgb,var(--a3) 45%,var(--card));border:1px solid var(--line)}
-.dupe{font-size:12px;color:var(--ink-soft);margin-top:6px}
+.note{font-size:13px;color:var(--ink-soft);margin:0}
 
 .panel{background:var(--band);color:var(--band-ink);border-radius:14px;padding:18px;display:grid;gap:12px;transition:background-color .8s ease}
 .panel h2{margin:0;font-family:var(--font-display);font-size:21px}
-.panel p{margin:0;opacity:.85;font-size:14px;max-width:62ch}
-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-form label{display:grid;gap:4px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-form .full{grid-column:1/-1}
-input,select,textarea{font:400 15px var(--font-body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
-textarea{min-height:64px;resize:vertical}
-.submit{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.submit button{font:700 15px var(--font-display);background:var(--a1);color:#fff;border:0;border-radius:8px;padding:11px 18px;cursor:pointer}
+.panel > p{margin:0;opacity:.85;font-size:14px;max-width:62ch}
+form.post{display:grid;gap:12px}
+.field{display:grid;gap:4px}
+.field > label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+input,select{font:400 16px var(--font-body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;width:100%}
+.snap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.snap input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.snapbtn{font:700 15px var(--font-display);background:var(--band-ink);color:var(--band);border-radius:8px;padding:11px 16px;cursor:pointer}
+.snap:focus-within .snapbtn{outline:3px solid var(--a1);outline-offset:2px}
+#pPreview{width:72px;height:72px;object-fit:cover;border-radius:8px;max-width:100%}
+#snapNote{font-size:13px;opacity:.85}
+
+.finder{background:var(--card);color:var(--ink);border-radius:10px;padding:12px;display:grid;gap:8px}
+.finder .field > label{color:var(--ink)}
+.results{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.results button{width:100%;text-align:left;background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:9px 11px;cursor:pointer;font:inherit;color:var(--ink);display:grid}
+.results button b{font-weight:600}
+.results button small{color:var(--ink-soft);font-size:12px}
+.manual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,160px);gap:8px}
+.picked{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);color:var(--ink);border-radius:10px;padding:10px 12px}
+.picked small{display:block;color:var(--ink-soft)}
+.picked a{color:var(--ink-soft);font-size:13px}
 .toast{font-size:14px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+.remind{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,280px);gap:20px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.remind h2{margin:0 0 6px;font-family:var(--font-display);font-size:21px}
+.remind p{margin:0 0 14px;color:var(--ink-soft);font-size:14px;max-width:52ch}
+.rfields{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;max-width:300px}
+.rfields label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.phone{background:var(--ground);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px}
+.phead{font-size:12px;color:var(--ink-soft);text-align:center}
+.bubble{font-size:14px;padding:8px 12px;border-radius:14px;max-width:88%;line-height:1.4}
+.bubble.in{background:var(--card);border:1px solid var(--line);justify-self:start}
+.bubble.out{background:var(--band);color:var(--band-ink);justify-self:end}
 
 .how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .how div{border-top:3px solid var(--a1);padding-top:10px}
@@ -135,11 +126,7 @@ textarea{min-height:64px;resize:vertical}
 footer{color:var(--ink-soft);font-size:12px}
 
 @media (max-width:600px){
-  form{grid-template-columns:1fr}
-  .how{grid-template-columns:1fr}
-  .soup{grid-template-columns:1fr}
-  .side{text-align:left}
-  .event{grid-template-columns:58px 1fr;gap:10px}
+  .how,.remind,.manual{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -149,10 +136,10 @@ footer{color:var(--ink-soft);font-size:12px}
   <div class="wrap">
     <div class="brand">
       <div>
-        <h1>Gorge Soup <span class="amp">&amp;</span> Tunes</h1>
-        <p>Today's soups at lunch. Tonight's music after dark. Hood River to The Dalles.</p>
+        <h1>Gorge Bowl</h1>
+        <p>Soups around the Gorge</p>
       </div>
-      <div class="seasons" role="group" aria-label="Season preview">
+      <div class="seasons" role="group" aria-label="Season colors">
         <button type="button" data-s="fall">Fall</button>
         <button type="button" data-s="winter">Winter</button>
         <button type="button" data-s="spring">Spring</button>
@@ -160,9 +147,8 @@ footer{color:var(--ink-soft);font-size:12px}
       </div>
     </div>
     <nav class="tabs" role="tablist">
-      <button role="tab" id="tab-soup" aria-selected="true" data-view="soup">Soup today</button>
-      <button role="tab" id="tab-tunes" aria-selected="false" data-view="tunes">Tonight</button>
-      <button role="tab" id="tab-post" aria-selected="false" data-view="post">Post a soup</button>
+      <button role="tab" aria-selected="true" data-view="soup">Soup today</button>
+      <button role="tab" aria-selected="false" data-view="post">Post a soup</button>
     </nav>
   </div>
   <div class="stripes"><span></span><span></span><span></span></div>
@@ -171,279 +157,305 @@ footer{color:var(--ink-soft);font-size:12px}
 <main>
   <div class="wrap">
 
-    <!-- SOUP -->
-    <section id="view-soup">
-      <div style="display:grid;gap:14px">
-        <div class="daybar">
-          <h2 id="soupDate">Thursday lunch</h2>
-          <span class="sample">Example listings</span>
-        </div>
-        <div class="filters" id="soupFilters">
-          <button class="chip" aria-pressed="true" data-f="all">All</button>
-          <button class="chip" aria-pressed="false" data-f="Hood River">Hood River</button>
-          <button class="chip" aria-pressed="false" data-f="White Salmon">White Salmon</button>
-          <button class="chip" aria-pressed="false" data-f="The Dalles">The Dalles</button>
-        </div>
-        <div class="list" id="soupList"></div>
-        <p class="addline">Don't see your lunch spot? <button type="button" id="goAdd" class="diff">Add a restaurant</button></p>
-        <div class="draw">
-          <div><b>Monthly soup drawing.</b> Every soup you post or check is one entry. November prize: $25 gift card from Bluff Road Bakery.</div>
-          <span class="count">You: <b id="entries">0 entries</b></span>
-        </div>
-      </div>
+    <section id="view-soup" class="stack">
+      <div class="daybar"><h2 id="soupDate">Today</h2></div>
+      <p class="note" id="soupMsg" hidden></p>
+      <div class="filters" id="soupFilters"></div>
+      <div class="list" id="soupList"></div>
+      <p style="margin:0;font-size:14px">Don't see your lunch spot? <button type="button" id="goAdd" class="link" style="color:var(--ink);font-weight:600">Add a restaurant</button></p>
     </section>
 
-    <!-- TUNES -->
-    <section id="view-tunes" hidden>
-      <div style="display:grid;gap:14px">
-        <div class="daybar">
-          <h2>Tonight in the Gorge</h2>
-          <span class="sample">Example listings</span>
-        </div>
-        <div class="filters" id="tuneFilters">
-          <button class="chip" aria-pressed="true" data-f="all">All</button>
-          <button class="chip" aria-pressed="false" data-f="music">Live music</button>
-          <button class="chip" aria-pressed="false" data-f="trivia">Trivia &amp; games</button>
-          <button class="chip" aria-pressed="false" data-f="free">No cover</button>
-        </div>
-        <div class="list" id="tuneList"></div>
-      </div>
-    </section>
-
-    <!-- POST -->
-    <section id="view-post" hidden>
+    <section id="view-post" class="stack" hidden>
       <div class="panel">
         <h2>Post today's soup</h2>
-        <p>For servers, cooks and owners. Snap the board or type it in. Posts clear at closing time, so tomorrow starts fresh.</p>
-        <form id="postForm" novalidate>
-          <div class="full snap">
+        <p>Snap the soup board or type it in. Soups clear at the end of the day, so tomorrow starts fresh.</p>
+        <form class="post" id="postForm" novalidate>
+          <div class="snap">
             <label for="pPhoto" class="snapbtn">Snap the soup board</label>
             <input id="pPhoto" type="file" accept="image/*" capture="environment">
             <img id="pPreview" alt="Photo of the soup board" hidden>
             <span id="snapNote">Or just type it below.</span>
           </div>
-          <label>Restaurant
-            <select id="pRest">
-              <option>River Daze Café</option>
-              <option>Lower Mill Kitchen</option>
-              <option>Pine Street Deli</option>
-              <option>Bluff Road Bakery</option>
-              <option value="__new">+ Add a restaurant</option>
-            </select>
-          </label>
-          <div class="full newrest" id="newRestBox" hidden>
-            <label>Restaurant name
-              <input id="newRest" type="text" placeholder="e.g. Columbia Street Café" autocomplete="off">
-            </label>
-            <label>Town
-              <select id="newTown"><option>Hood River</option><option>White Salmon</option><option>Bingen</option><option>The Dalles</option><option>Mosier</option><option>Cascade Locks</option><option>Parkdale</option></select>
-            </label>
+
+          <div class="field">
+            <label for="pRest">Restaurant</label>
+            <select id="pRest"></select>
           </div>
-          <label>Soup today
-            <input id="pSoup" type="text" value="Butternut squash" maxlength="40" autocomplete="off">
-          </label>
-          <label class="full">Other specials (optional)
-            <input id="pSpecial" type="text" value="Grilled cheese on sourdough" maxlength="60">
-          </label>
-          <div class="submit">
-            <button type="submit">Post soup</button>
+
+          <div id="addBox" class="finder" hidden>
+            <div class="field">
+              <label for="placeQ">Find the restaurant</label>
+              <input id="placeQ" type="search" placeholder="Start typing, e.g. Everybody's Brewing" autocomplete="off">
+            </div>
+            <ul class="results" id="placeResults" aria-live="polite"></ul>
+            <p class="note" id="placeHint">Type at least 3 letters to search places around the Gorge.</p>
+            <div id="manualBox" hidden>
+              <p class="note" style="margin-bottom:6px">Not showing up? Add it by name:</p>
+              <div class="manual">
+                <input id="manName" type="text" placeholder="Restaurant name" maxlength="50" aria-label="Restaurant name">
+                <select id="manTown" aria-label="Town">
+                  <option>Hood River</option><option>White Salmon</option><option>Bingen</option><option>The Dalles</option><option>Mosier</option><option>Cascade Locks</option><option>Parkdale</option><option>Stevenson</option><option>Lyle</option>
+                </select>
+              </div>
+              <div class="row" style="margin-top:8px"><button type="button" class="btn" id="manAdd">Add restaurant</button></div>
+            </div>
+          </div>
+
+          <div id="pickedBox" class="picked" hidden></div>
+
+          <div class="field">
+            <label for="pSoup">Soup today</label>
+            <input id="pSoup" type="text" placeholder="e.g. Tomato bisque" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pSpecial">Other specials (optional)</label>
+            <input id="pSpecial" type="text" placeholder="e.g. Grilled cheese on sourdough" maxlength="60" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pRole">I'm posting as</label>
+            <select id="pRole"><option value="restaurant">Someone who works there</option><option value="customer">A customer</option></select>
+          </div>
+          <div class="row">
+            <button type="submit" class="btn">Post soup</button>
             <span class="toast" id="toast" aria-live="polite"></span>
           </div>
         </form>
       </div>
 
       <div class="remind">
-        <div class="remind-set">
+        <div>
           <h2>Daily soup reminder</h2>
-          <p>Each restaurant that signs up gets a nudge every morning. Reply with the soup, or a photo of the board, and it posts.</p>
+          <p>Coming soon. Each restaurant that signs up gets a nudge every morning. Reply with the soup, or a photo of the board, and it posts.</p>
           <div class="rfields">
             <label for="rHow">Send it by</label>
             <select id="rHow"><option>Text</option><option>Email</option></select>
             <label for="rTime">At</label>
             <select id="rTime"><option>9:30 am</option><option>10:00 am</option><option selected>10:30 am</option><option>11:00 am</option></select>
           </div>
-          <label class="rdays"><input type="checkbox" id="rDays" checked> Only on days we're open</label>
         </div>
         <div class="phone" aria-label="Example reminder">
-          <div class="phead" id="pHead">Gorge Soup · 10:30 am</div>
-          <div class="bubble in" id="rMsg">Morning, River Daze! What's the soup today? Reply with the name or a photo of the board. Add any specials too.</div>
-          <div class="bubble out">Tomato basil. Special is half sandwich + cup</div>
-          <div class="bubble in">Posted! River Daze: Tomato basil, special: half sandwich + cup. Reply FIX to change it.</div>
+          <div class="phead" id="pHead">Gorge Bowl · 10:30 am</div>
+          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the name or a photo of the board. Add any specials too.</div>
+          <div class="bubble out">Tomato bisque. Special is half sandwich + cup</div>
+          <div class="bubble in">Posted! Reply FIX to change it.</div>
         </div>
       </div>
     </section>
 
-    <section aria-labelledby="howTitle" style="display:grid;gap:12px">
-      <h2 id="howTitle" style="font-family:var(--font-display);font-size:18px;margin:0">Where the listings come from</h2>
+    <section aria-labelledby="howTitle" class="stack">
+      <h2 id="howTitle" style="font-family:var(--font-display);font-size:18px;margin:0">How it works</h2>
       <div class="how">
-        <div><h4>Staff post soups</h4><p>Each morning restaurants get a text or email asking for the soup. They reply with the name or a photo of the board, and it posts.</p></div>
-        <div><h4>Events are pulled in</h4><p>Venue calendar feeds, Bandsintown, venue websites and event pages are gathered each afternoon and merged.</p></div>
-        <div><h4>No comments, no reviews</h4><p>People can post a soup or check it. That's it. No ratings, no complaints, nothing to argue about.</p></div>
+        <div><h4>Anyone can post</h4><p>Staff or customers post the soup by typing it or snapping the board. The restaurant's own post always wins.</p></div>
+        <div><h4>Customers check it</h4><p>See the same soup? Tap ✓. Different soup? Fix it. The checks show how sure the listing is.</p></div>
+        <div><h4>No comments, no reviews</h4><p>People can post a soup or check it. That's it. No ratings, no complaints.</p></div>
       </div>
     </section>
 
-    <footer>Prototype. Restaurants, soups and events shown here are made-up examples. Logo to come from a designer.</footer>
+    <footer>Early version. Restaurants and soups you add are saved on this device only for now.</footer>
   </div>
 </main>
 
 <script>
-const soups = [
-  {rest:"River Daze Café", town:"Hood River", soup:"Tomato bisque", mins:22, special:"Half sandwich and cup combo", by:"customer", checks:2},
-  {rest:"Lower Mill Kitchen", town:"Hood River", soup:"Chicken noodle", mins:51, special:null, by:"restaurant", checks:4},
-  {rest:"Pine Street Deli", town:"The Dalles", soup:"Beef stew", mins:95, special:"Pastrami melt", by:"restaurant", checks:0},
-  {rest:"Bluff Road Bakery", town:"White Salmon", soup:"Red lentil", mins:130, special:"Pear ginger scones", by:"customer", checks:0}
-];
-let entries = 0, editing = null;
-const towns = Object.fromEntries(soups.map(s => [s.rest, s.town]));
-const events = [
-  {t:"6:00", ap:"pm", title:"Bluegrass jam", venue:"Riverside taproom", town:"Hood River", kind:"music", free:true, desc:"Open jam, bring an instrument. All levels.", src:["Venue website"]},
-  {t:"7:00", ap:"pm", title:"Pub trivia", venue:"Oak Street pub", town:"Hood River", kind:"trivia", free:true, desc:"Teams up to six. Prizes from local shops.", src:["Facebook page"]},
-  {t:"7:30", ap:"pm", title:"The Ponderosa Rounders", venue:"The Ruins", town:"Hood River", kind:"music", free:false, desc:"Americana four-piece. $10 at the door, food carts open.", src:["Bandsintown","Facebook event","The Ruins calendar"], dupes:2},
-  {t:"8:00", ap:"pm", title:"Singer-songwriter night", venue:"Bingen wine bar", town:"Bingen", kind:"music", free:true, desc:"Three local songwriters, 40-minute sets.", src:["Community group post"]},
-  {t:"9:00", ap:"pm", title:"Basalt Groove (funk)", venue:"Second Street hall", town:"The Dalles", kind:"music", free:false, desc:"Dance floor open. 21+, $8 cover.", src:["Bandsintown","Venue website"], dupes:1}
-];
-
 const $ = s => document.querySelector(s);
-const ago = m => m < 60 ? m + " min ago" : Math.round(m/60) + " hr ago";
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const todayKey = () => new Date().toLocaleDateString("en-CA");
+const mapsUrl = r => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([r.name, r.address || r.town].filter(Boolean).join(", "));
 
-let soupFilter = "all", tuneFilter = "all";
-function renderSoups(){
-  const list = soups.filter(s => soupFilter==="all" || s.town===soupFilter);
-  $("#soupList").innerHTML = list.length ? list.map(s => `
-    <article class="soup">
-      <div class="where">${esc(s.rest)} <small>${esc(s.town)} · ${ago(s.mins)}</small></div>
-      <h3>${esc(s.soup)}</h3>
-      ${s.special ? `<div class="special"><b>Special:</b> ${esc(s.special)}</div>` : ""}
-      <div class="verify">
-        <span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
-        <button type="button" class="check" data-act="check" data-r="${esc(s.rest)}" aria-pressed="${!!s.checked}">✓ ${s.checked ? "You checked" : "That's right"}${s.checks ? ` · ${s.checks}` : ""}</button>
-        <button type="button" class="diff" data-act="diff" data-r="${esc(s.rest)}">Different soup?</button>
-      </div>
-      ${editing===s.rest ? `<form class="fix" data-r="${esc(s.rest)}"><label for="fixIn" class="vh">What's the soup?</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit">Update</button></form>` : ""}
-    </article>`).join("") : `<p>No soups posted in that town yet today.</p>`;
-  $("#entries").textContent = entries === 1 ? "1 entry" : entries + " entries";
-  if (editing) { const f = $("#fixIn"); f && f.focus(); }
+/* ---------- storage (this device only for now) ---------- */
+function load(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch(e){ return d; } }
+function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+let restaurants = load("gb.restaurants", []);           // {id,name,town,address,lat,lon}
+let day = load("gb.day", {date: todayKey(), soups:{}});  // soups keyed by restaurant id
+if (day.date !== todayKey()) day = {date: todayKey(), soups:{}};
+const persist = () => { save("gb.restaurants", restaurants); save("gb.day", day); };
+
+let townFilter = "all", editing = null;
+
+/* ---------- soup list ---------- */
+const ago = ts => { const m = Math.max(1, Math.round((Date.now() - ts)/60000)); return m < 60 ? m + " min ago" : Math.round(m/60) + " hr ago"; };
+function flash(msg){ const p = $("#soupMsg"); p.textContent = msg; p.hidden = false; clearTimeout(flash.t); flash.t = setTimeout(() => p.hidden = true, 4000); }
+
+function renderFilters(){
+  const towns = [...new Set(restaurants.map(r => r.town).filter(Boolean))].sort();
+  if (townFilter !== "all" && !towns.includes(townFilter)) townFilter = "all";
+  $("#soupFilters").hidden = towns.length < 2;
+  $("#soupFilters").innerHTML = ["all", ...towns].map(t =>
+    `<button class="chip" data-f="${esc(t)}" aria-pressed="${t===townFilter}">${t==="all" ? "All" : esc(t)}</button>`).join("");
 }
+
+function renderSoups(){
+  renderFilters();
+  if (!restaurants.length){
+    $("#soupList").innerHTML = `<div class="empty"><h3>No restaurants yet</h3><p>Add the first lunch spot, then post what's in the soup pot today.</p><button type="button" class="btn" data-act="add">Add a restaurant</button></div>`;
+    return;
+  }
+  const list = restaurants
+    .filter(r => townFilter==="all" || r.town===townFilter)
+    .map(r => ({r, s: day.soups[r.id]}))
+    .sort((a,b) => (b.s ? b.s.ts : 0) - (a.s ? a.s.ts : 0) || a.r.name.localeCompare(b.r.name));
+  $("#soupList").innerHTML = list.map(({r,s}) => `
+    <article class="soup">
+      <div class="where"><span>${esc(r.name)}</span><small>${esc(r.town || "")}${s ? " · " + ago(s.ts) : ""} · <a href="${mapsUrl(r)}" target="_blank" rel="noopener">Map</a></small></div>
+      ${s ? `<h3>${esc(s.soup)}</h3>` : `<h3 class="none">No soup posted yet today</h3>`}
+      ${s && s.special ? `<div class="special"><b>Special:</b> ${esc(s.special)}</div>` : ""}
+      <div class="verify">
+        ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
+        <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!s.mine}">✓ ${s.mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
+        ${s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
+        : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Post the soup</button>`}
+      </div>
+      ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
+    </article>`).join("") || `<p>No restaurants in that town yet.</p>`;
+  if (editing){ const f = $("#fixIn"); f && f.focus(); }
+}
+
+$("#soupFilters").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  townFilter = b.dataset.f; renderSoups();
+});
 $("#soupList").addEventListener("click", e => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
-  const s = soups.find(x => x.rest === b.dataset.r);
-  if (b.dataset.act === "check") {
-    s.checked = !s.checked; s.checks += s.checked ? 1 : -1; entries += s.checked ? 1 : -1;
-  } else { editing = editing === s.rest ? null : s.rest; }
+  if (b.dataset.act === "add") return startAdd();
+  const id = b.dataset.id, s = day.soups[id];
+  if (b.dataset.act === "check" && s){ s.mine = !s.mine; s.checks += s.mine ? 1 : -1; persist(); }
+  if (b.dataset.act === "fix") editing = editing === id ? null : id;
   renderSoups();
 });
 $("#soupList").addEventListener("submit", e => {
   e.preventDefault();
   const v = $("#fixIn").value.trim(); if (!v) return;
-  const s = soups.find(x => x.rest === e.target.dataset.r);
-  if (s.checked) entries--;
-  Object.assign(s, {soup:v, by:"customer", checks:0, checked:false, mins:1});
-  entries++; editing = null; renderSoups();
+  const id = e.target.dataset.id, old = day.soups[id];
+  if (old && old.by === "restaurant"){ flash("The restaurant posted this one, so only they can change it."); editing = null; renderSoups(); return; }
+  day.soups[id] = {soup:v, special: old ? old.special : null, by:"customer", checks:0, mine:false, ts:Date.now()};
+  editing = null; persist(); renderSoups();
 });
-function renderTunes(){
-  const list = events.filter(e => tuneFilter==="all" || e.kind===tuneFilter || (tuneFilter==="free" && e.free));
-  $("#tuneList").innerHTML = list.map(e => `
-    <article class="event">
-      <time>${e.t}<small>${e.ap}</small></time>
-      <div>
-        <h3>${esc(e.title)}</h3>
-        <div class="venue">${esc(e.venue)} · ${esc(e.town)}</div>
-        <p>${esc(e.desc)}</p>
-        <div class="sources">${e.src.map(s => `<span class="src">${esc(s)}</span>`).join("")}</div>
-        ${e.dupes ? `<div class="dupe">Found in ${e.src.length} places, merged into one listing</div>` : ""}
-      </div>
-    </article>`).join("");
-}
 
-function wireChips(sel, set, render){
-  document.querySelectorAll(sel + " .chip").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll(sel + " .chip").forEach(x => x.setAttribute("aria-pressed", x===b));
-    set(b.dataset.f); render();
-  }));
-}
-wireChips("#soupFilters", v => soupFilter = v, renderSoups);
-wireChips("#tuneFilters", v => tuneFilter = v, renderTunes);
-
+/* ---------- views ---------- */
 function showView(v){
-  ["soup","tunes","post"].forEach(n => { $("#view-"+n).hidden = n!==v; });
+  ["soup","post"].forEach(n => { $("#view-"+n).hidden = n!==v; });
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view===v));
+  window.scrollTo(0,0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
 
-function seasonFor(d){
-  const m = d.getMonth()+1, day = d.getDate();
-  const md = m*100 + day;
-  if (md >= 1221 || md < 320) return "winter";
-  if (md < 621) return "spring";
-  if (md < 922) return "summer";
-  return "fall";
+/* ---------- restaurant picker ---------- */
+function renderPicker(sel){
+  const opts = restaurants.slice().sort((a,b) => a.name.localeCompare(b.name))
+    .map(r => `<option value="${r.id}">${esc(r.name)}${r.town ? " · " + esc(r.town) : ""}</option>`).join("");
+  $("#pRest").innerHTML = (restaurants.length ? `<option value="">Pick a restaurant</option>` : "") + opts + `<option value="__new">+ Add a restaurant</option>`;
+  $("#pRest").value = sel || (restaurants.length ? "" : "__new");
+  toggleAdd();
 }
-function setSeason(s){
-  document.body.dataset.season = s;
-  document.querySelectorAll(".seasons button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s===s));
+function toggleAdd(){
+  const isNew = $("#pRest").value === "__new";
+  $("#addBox").hidden = !isNew;
+  $("#pickedBox").hidden = true;
 }
-document.querySelectorAll(".seasons button").forEach(b => b.addEventListener("click", () => setSeason(b.dataset.s)));
-setSeason(seasonFor(new Date()));
+$("#pRest").addEventListener("change", () => { toggleAdd(); if ($("#pRest").value==="__new") $("#placeQ").focus(); });
+function startAdd(){
+  showView("post"); renderPicker("__new");
+  $("#placeQ").value = ""; $("#placeResults").innerHTML = ""; $("#manualBox").hidden = true;
+  $("#placeHint").textContent = "Type at least 3 letters to search places around the Gorge.";
+  $("#placeQ").focus();
+}
+$("#goAdd").addEventListener("click", startAdd);
 
-$("#soupDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"}) + " · lunch";
+/* Place search: Photon, a free OpenStreetMap search, biased to the Gorge. */
+const GORGE = {lat:45.70, lon:-121.50, bbox:"-122.20,45.45,-120.80,45.95"};
+let searchTimer = null, searchSeq = 0, places = [];
+$("#placeQ").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  const q = $("#placeQ").value.trim();
+  if (q.length < 3){ $("#placeResults").innerHTML = ""; $("#placeHint").textContent = "Type at least 3 letters to search places around the Gorge."; $("#manualBox").hidden = true; return; }
+  $("#placeHint").textContent = "Searching…";
+  searchTimer = setTimeout(() => search(q), 300);
+});
+async function search(q){
+  const seq = ++searchSeq;
+  let found = [];
+  try {
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=${GORGE.lat}&lon=${GORGE.lon}&bbox=${GORGE.bbox}&limit=8&lang=en`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    found = (data.features || []).filter(f => f.properties && f.properties.name).map(f => {
+      const p = f.properties, town = p.city || p.town || p.village || p.district || p.county || "";
+      const street = [p.housenumber, p.street].filter(Boolean).join(" ");
+      return { name:p.name, town, address:[street, town].filter(Boolean).join(", "),
+               lat:f.geometry.coordinates[1], lon:f.geometry.coordinates[0], kind:(p.osm_value || "").replace(/_/g," ") };
+    });
+  } catch(e){ found = null; }
+  if (seq !== searchSeq) return;
+  $("#manName").value = q;
+  $("#manualBox").hidden = false;
+  if (found === null){ places = []; $("#placeResults").innerHTML = ""; $("#placeHint").textContent = "Place search isn't reachable right now. You can add it by name below."; return; }
+  places = found;
+  $("#placeHint").textContent = found.length ? "Tap the right one." : "No matches around the Gorge.";
+  $("#placeResults").innerHTML = found.map((p,i) => `<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><small>${esc([p.kind, p.address || p.town].filter(Boolean).join(" · "))}</small></button></li>`).join("");
+}
+$("#placeResults").addEventListener("click", e => {
+  const b = e.target.closest("button[data-i]"); if (!b) return;
+  addRestaurant(places[+b.dataset.i]);
+});
+$("#manAdd").addEventListener("click", () => {
+  const name = $("#manName").value.trim(); if (!name){ $("#manName").focus(); return; }
+  addRestaurant({name, town:$("#manTown").value, address:""});
+});
+function addRestaurant(p){
+  let r = restaurants.find(x => x.name.toLowerCase() === p.name.toLowerCase() && (x.town||"") === (p.town||""));
+  if (!r){ r = {id:"r" + Date.now().toString(36), name:p.name, town:p.town, address:p.address, lat:p.lat, lon:p.lon}; restaurants.push(r); persist(); }
+  renderPicker(r.id);
+  $("#pickedBox").hidden = false;
+  $("#pickedBox").innerHTML = `<div><b>${esc(r.name)}</b><small>${esc(r.address || r.town)}</small></div><a href="${mapsUrl(r)}" target="_blank" rel="noopener">Open in Google Maps</a>`;
+  renderSoups();
+  $("#pSoup").focus();
+}
 
+/* ---------- posting ---------- */
 $("#postForm").addEventListener("submit", e => {
   e.preventDefault();
-  const soup = $("#pSoup").value.trim();
-  if (!soup){ $("#toast").textContent = "Add the soup name, then post."; return; }
-  let rest = $("#pRest").value;
-  if (rest === "__new") {
-    rest = $("#newRest").value.trim();
-    if (!rest){ $("#toast").textContent = "Add the restaurant's name, then post."; $("#newRest").focus(); return; }
-    const exists = [...$("#pRest").options].find(o => o.value.toLowerCase() === rest.toLowerCase());
-    if (exists) rest = exists.value;
-    else {
-      towns[rest] = $("#newTown").value;
-      const o = new Option(rest, rest);
-      $("#pRest").add(o, $("#pRest").options.length - 1);
-    }
-    $("#pRest").value = rest; $("#newRestBox").hidden = true; $("#newRest").value = "";
-  }
-  for (let i = soups.length - 1; i >= 0; i--) if (soups[i].rest === rest) soups.splice(i, 1);
-  soups.unshift({ rest, town: towns[rest] || "Hood River",
-    soup, mins:1, special:$("#pSpecial").value.trim() || null, by:"restaurant", checks:0 });
-  renderSoups();
-  $("#toast").textContent = "Posted. It's at the top of Soup today.";
-  setTimeout(() => showView("soup"), 900);
+  const id = $("#pRest").value, soup = $("#pSoup").value.trim();
+  if (!id || id === "__new"){ $("#toast").textContent = "Pick or add the restaurant first."; return; }
+  if (!soup){ $("#toast").textContent = "Add the soup name, then post."; $("#pSoup").focus(); return; }
+  const by = $("#pRole").value, old = day.soups[id];
+  if (by === "customer" && old && old.by === "restaurant"){ $("#toast").textContent = "The restaurant already posted today's soup. Tap ✓ on it if it's right."; return; }
+  day.soups[id] = {soup, special:$("#pSpecial").value.trim() || null, by, checks:0, mine:false, ts:Date.now()};
+  persist(); renderSoups();
+  $("#toast").textContent = "Posted.";
+  $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pickedBox").hidden = true;
+  $("#pPreview").hidden = true; $("#snapNote").textContent = "Or just type it below.";
+  setTimeout(() => { $("#toast").textContent = ""; showView("soup"); }, 800);
 });
-
 $("#pPhoto").addEventListener("change", e => {
-  const f = e.target.files && e.target.files[0];
-  if (!f) return;
-  const img = $("#pPreview");
-  img.src = URL.createObjectURL(f); img.hidden = false;
-  $("#snapNote").textContent = "Got the photo. In the real app the soup name fills in from the board, and you check it before posting.";
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  $("#pPreview").src = URL.createObjectURL(f); $("#pPreview").hidden = false;
+  $("#snapNote").textContent = "Got the photo. Reading the board is coming soon, so type the soup below for now.";
 });
 
-$("#pRest").addEventListener("change", () => {
-  const isNew = $("#pRest").value === "__new";
-  $("#newRestBox").hidden = !isNew;
-  if (isNew) $("#newRest").focus();
-});
-$("#goAdd").addEventListener("click", () => {
-  showView("post");
-  $("#pRest").value = "__new"; $("#newRestBox").hidden = false;
-  $("#pSoup").value = ""; $("#pSpecial").value = "";
-  $("#newRest").focus();
-});
+/* ---------- reminder mockup ---------- */
 function renderReminder(){
-  const email = $("#rHow").value === "Email";
-  const t = $("#rTime").value;
-  $("#pHead").textContent = (email ? "Email from Gorge Soup · " : "Gorge Soup · ") + t;
-  $("#rMsg").textContent = email
-    ? "Subject: What's the soup today? Hit reply with the soup name or attach a photo of the board. Add any specials too."
-    : "Morning, River Daze! What's the soup today? Reply with the name or a photo of the board. Add any specials too.";
+  const email = $("#rHow").value === "Email", t = $("#rTime").value;
+  $("#pHead").textContent = (email ? "Email from Gorge Bowl · " : "Gorge Bowl · ") + t;
+  $("#rMsg").textContent = email ? "Subject: What's the soup today? Hit reply with the soup name or attach a photo of the board."
+                                 : "Morning! What's the soup today? Reply with the name or a photo of the board. Add any specials too.";
 }
 $("#rHow").addEventListener("change", renderReminder);
 $("#rTime").addEventListener("change", renderReminder);
 
-renderSoups(); renderTunes();
+/* ---------- seasons ---------- */
+function seasonFor(d){ const md = (d.getMonth()+1)*100 + d.getDate();
+  if (md >= 1221 || md < 320) return "winter"; if (md < 621) return "spring"; if (md < 922) return "summer"; return "fall"; }
+function setSeason(s){
+  document.body.dataset.season = s;
+  document.querySelectorAll(".seasons button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s===s));
+  const band = getComputedStyle(document.body).getPropertyValue("--band").trim();
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", band);
+}
+document.querySelectorAll(".seasons button").forEach(b => b.addEventListener("click", () => setSeason(b.dataset.s)));
+setSeason(seasonFor(new Date()));
+
+$("#soupDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+renderPicker(); renderSoups();
 </script>
 </body>
 </html>
