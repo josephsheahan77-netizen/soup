@@ -251,29 +251,94 @@ footer{color:var(--ink-soft);font-size:12px}
       </div>
     </section>
 
-    <footer>Early version. Restaurants and soups you add are saved on this device only for now.</footer>
+    <footer id="footNote">Early version.</footer>
   </div>
 </main>
 
 <script>
+/* ---------- shared database (Supabase) ----------
+   Fill these two in from Supabase: Project Settings > API.
+   The key is the "anon" / "publishable" key, which is meant to be public.
+   Leave them empty to run in single-device mode (saved on this phone only). */
+const DB_URL = "";
+const DB_KEY = "";
+const REMOTE = !!(DB_URL && DB_KEY);
+
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const todayKey = () => new Date().toLocaleDateString("en-CA");
+const todayKey = () => new Date().toLocaleDateString("en-CA", {timeZone:"America/Los_Angeles"});
 const mapsUrl = r => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([r.name, r.address || r.town].filter(Boolean).join(", "));
 
-/* ---------- storage (this device only for now) ---------- */
+/* ---------- device storage ---------- */
 function load(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch(e){ return d; } }
 function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-let restaurants = load("gb.restaurants", []);           // {id,name,town,address,lat,lon}
-let day = load("gb.day", {date: todayKey(), soups:{}});  // soups keyed by restaurant id
-if (day.date !== todayKey()) day = {date: todayKey(), soups:{}};
-const persist = () => { save("gb.restaurants", restaurants); save("gb.day", day); };
+
+let restaurants = [];                   // {id,name,town,address,lat,lon}
+let soups = {};                         // restaurant id -> {id,soup,special,by,checks,ts}
+let checked = load("gb.checked", {});   // soup ids this device has checked
+let loaded = !REMOTE, loadError = "";
+
+if (!REMOTE){
+  restaurants = load("gb.restaurants", []);
+  const day = load("gb.day", {date: todayKey(), soups:{}});
+  soups = day.date === todayKey() ? day.soups : {};
+}
+function saveLocal(){
+  save("gb.checked", checked);
+  if (!REMOTE){ save("gb.restaurants", restaurants); save("gb.day", {date: todayKey(), soups}); }
+}
+
+/* ---------- talking to the database ---------- */
+async function api(path, body){
+  const headers = {"apikey": DB_KEY, "Content-Type": "application/json"};
+  if (DB_KEY.startsWith("eyJ")) headers["Authorization"] = "Bearer " + DB_KEY;
+  const res = await fetch(DB_URL.replace(/\/+$/, "") + "/rest/v1/" + path, {
+    method: body ? "POST" : "GET", headers, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && (data.message || data.hint)) || "Couldn't reach the soup database.");
+  return data;
+}
+const toSoup = row => ({id:row.id, soup:row.soup, special:row.special, by:row.posted_by, checks:row.checks, ts:Date.parse(row.created_at)});
+
+async function refresh(){
+  if (!REMOTE) return;
+  try {
+    const [rs, ss] = await Promise.all([
+      api("restaurants?select=id,name,town,address,lat,lon&order=name"),
+      api("todays_soups?select=*")
+    ]);
+    if (!Array.isArray(rs) || !Array.isArray(ss)) throw new Error("The soup database sent back something unexpected.");
+    restaurants = rs;
+    soups = Object.fromEntries(ss.map(r => [r.restaurant_id, toSoup(r)]));
+    loaded = true; loadError = "";
+  } catch(e){ loadError = e.message; }
+  const keep = $("#pRest").value;
+  renderSoups(); renderPicker(keep);
+}
+
+const store = {
+  async addRestaurant(p){
+    if (REMOTE) return api("rpc/add_restaurant", {p_name:p.name, p_town:p.town || "", p_address:p.address || "", p_lat:p.lat ?? null, p_lon:p.lon ?? null});
+    let r = restaurants.find(x => x.name.toLowerCase() === p.name.toLowerCase() && (x.town||"") === (p.town||""));
+    return r || {id:"r" + Date.now().toString(36), name:p.name, town:p.town || "", address:p.address || "", lat:p.lat, lon:p.lon};
+  },
+  async postSoup(rid, soup, special, by){
+    if (REMOTE) return toSoup(await api("rpc/post_soup", {p_restaurant_id:rid, p_soup:soup, p_special:special, p_posted_by:by}));
+    const old = soups[rid];
+    if (by === "customer" && old && old.by === "restaurant") throw new Error("The restaurant already posted today's soup");
+    return {id:"s" + Date.now().toString(36), soup, special, by, checks:0, ts:Date.now()};
+  },
+  async check(soupId, delta){
+    if (REMOTE) return api("rpc/check_soup", {p_soup_id:soupId, p_delta:delta});
+    return null;
+  }
+};
 
 let townFilter = "all", editing = null;
 
 /* ---------- soup list ---------- */
 const ago = ts => { const m = Math.max(1, Math.round((Date.now() - ts)/60000)); return m < 60 ? m + " min ago" : Math.round(m/60) + " hr ago"; };
-function flash(msg){ const p = $("#soupMsg"); p.textContent = msg; p.hidden = false; clearTimeout(flash.t); flash.t = setTimeout(() => p.hidden = true, 4000); }
+function flash(msg){ const p = $("#soupMsg"); p.textContent = msg; p.hidden = false; clearTimeout(flash.t); flash.t = setTimeout(() => p.hidden = true, 5000); }
 
 function renderFilters(){
   const towns = [...new Set(restaurants.map(r => r.town).filter(Boolean))].sort();
@@ -285,27 +350,35 @@ function renderFilters(){
 
 function renderSoups(){
   renderFilters();
+  if (!loaded){
+    $("#soupList").innerHTML = loadError
+      ? `<div class="empty"><h3>Can't load soups right now</h3><p>${esc(loadError)} Check your connection and try again.</p><button type="button" class="btn" data-act="retry">Try again</button></div>`
+      : `<div class="empty"><h3>Loading today's soups…</h3></div>`;
+    return;
+  }
   if (!restaurants.length){
     $("#soupList").innerHTML = `<div class="empty"><h3>No restaurants yet</h3><p>Add the first lunch spot, then post what's in the soup pot today.</p><button type="button" class="btn" data-act="add">Add a restaurant</button></div>`;
     return;
   }
   const list = restaurants
     .filter(r => townFilter==="all" || r.town===townFilter)
-    .map(r => ({r, s: day.soups[r.id]}))
+    .map(r => ({r, s: soups[r.id]}))
     .sort((a,b) => (b.s ? b.s.ts : 0) - (a.s ? a.s.ts : 0) || a.r.name.localeCompare(b.r.name));
-  $("#soupList").innerHTML = list.map(({r,s}) => `
+  $("#soupList").innerHTML = list.map(({r,s}) => {
+    const mine = s && checked[s.id];
+    return `
     <article class="soup">
       <div class="where"><span>${esc(r.name)}</span><small>${esc(r.town || "")}${s ? " · " + ago(s.ts) : ""} · <a href="${mapsUrl(r)}" target="_blank" rel="noopener">Map</a></small></div>
       ${s ? `<h3>${esc(s.soup)}</h3>` : `<h3 class="none">No soup posted yet today</h3>`}
       ${s && s.special ? `<div class="special"><b>Special:</b> ${esc(s.special)}</div>` : ""}
       <div class="verify">
         ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
-        <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!s.mine}">✓ ${s.mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
+        <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
         ${s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
         : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Post the soup</button>`}
       </div>
       ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
-    </article>`).join("") || `<p>No restaurants in that town yet.</p>`;
+    </article>`; }).join("") || `<p>No restaurants in that town yet.</p>`;
   if (editing){ const f = $("#fixIn"); f && f.focus(); }
 }
 
@@ -313,21 +386,30 @@ $("#soupFilters").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b) return;
   townFilter = b.dataset.f; renderSoups();
 });
-$("#soupList").addEventListener("click", e => {
+$("#soupList").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
-  if (b.dataset.act === "add") return startAdd();
-  const id = b.dataset.id, s = day.soups[id];
-  if (b.dataset.act === "check" && s){ s.mine = !s.mine; s.checks += s.mine ? 1 : -1; persist(); }
-  if (b.dataset.act === "fix") editing = editing === id ? null : id;
-  renderSoups();
+  const act = b.dataset.act;
+  if (act === "add") return startAdd();
+  if (act === "retry"){ loadError = ""; renderSoups(); return refresh(); }
+  const id = b.dataset.id, s = soups[id];
+  if (act === "fix"){ editing = editing === id ? null : id; return renderSoups(); }
+  if (act === "check" && s){
+    const delta = checked[s.id] ? -1 : 1;
+    if (delta > 0) checked[s.id] = 1; else delete checked[s.id];
+    s.checks = Math.max(0, s.checks + delta);
+    saveLocal(); renderSoups();
+    try { const n = await store.check(s.id, delta); if (typeof n === "number"){ s.checks = n; renderSoups(); } }
+    catch(err){ flash(err.message); }
+  }
 });
-$("#soupList").addEventListener("submit", e => {
+$("#soupList").addEventListener("submit", async e => {
   e.preventDefault();
   const v = $("#fixIn").value.trim(); if (!v) return;
-  const id = e.target.dataset.id, old = day.soups[id];
-  if (old && old.by === "restaurant"){ flash("The restaurant posted this one, so only they can change it."); editing = null; renderSoups(); return; }
-  day.soups[id] = {soup:v, special: old ? old.special : null, by:"customer", checks:0, mine:false, ts:Date.now()};
-  editing = null; persist(); renderSoups();
+  const id = e.target.dataset.id, old = soups[id];
+  try {
+    soups[id] = await store.postSoup(id, v, old ? old.special : null, "customer");
+    editing = null; saveLocal(); renderSoups();
+  } catch(err){ editing = null; flash(err.message + "."); refresh(); renderSoups(); }
 });
 
 /* ---------- views ---------- */
@@ -343,17 +425,17 @@ function renderPicker(sel){
   const opts = restaurants.slice().sort((a,b) => a.name.localeCompare(b.name))
     .map(r => `<option value="${r.id}">${esc(r.name)}${r.town ? " · " + esc(r.town) : ""}</option>`).join("");
   $("#pRest").innerHTML = (restaurants.length ? `<option value="">Pick a restaurant</option>` : "") + opts + `<option value="__new">+ Add a restaurant</option>`;
-  $("#pRest").value = sel || (restaurants.length ? "" : "__new");
-  toggleAdd();
+  const valid = sel && (sel === "__new" || restaurants.some(r => r.id === sel));
+  $("#pRest").value = valid ? sel : (restaurants.length ? "" : "__new");
+  $("#addBox").hidden = $("#pRest").value !== "__new";
 }
-function toggleAdd(){
-  const isNew = $("#pRest").value === "__new";
-  $("#addBox").hidden = !isNew;
+$("#pRest").addEventListener("change", () => {
   $("#pickedBox").hidden = true;
-}
-$("#pRest").addEventListener("change", () => { toggleAdd(); if ($("#pRest").value==="__new") $("#placeQ").focus(); });
+  $("#addBox").hidden = $("#pRest").value !== "__new";
+  if ($("#pRest").value==="__new") $("#placeQ").focus();
+});
 function startAdd(){
-  showView("post"); renderPicker("__new");
+  showView("post"); renderPicker("__new"); $("#pickedBox").hidden = true;
   $("#placeQ").value = ""; $("#placeResults").innerHTML = ""; $("#manualBox").hidden = true;
   $("#placeHint").textContent = "Type at least 3 letters to search places around the Gorge.";
   $("#placeQ").focus();
@@ -401,9 +483,13 @@ $("#manAdd").addEventListener("click", () => {
   const name = $("#manName").value.trim(); if (!name){ $("#manName").focus(); return; }
   addRestaurant({name, town:$("#manTown").value, address:""});
 });
-function addRestaurant(p){
-  let r = restaurants.find(x => x.name.toLowerCase() === p.name.toLowerCase() && (x.town||"") === (p.town||""));
-  if (!r){ r = {id:"r" + Date.now().toString(36), name:p.name, town:p.town, address:p.address, lat:p.lat, lon:p.lon}; restaurants.push(r); persist(); }
+async function addRestaurant(p){
+  $("#placeHint").textContent = "Adding…";
+  let r;
+  try { r = await store.addRestaurant(p); }
+  catch(err){ $("#placeHint").textContent = err.message; return; }
+  if (!restaurants.some(x => x.id === r.id)) restaurants.push(r);
+  saveLocal();
   renderPicker(r.id);
   $("#pickedBox").hidden = false;
   $("#pickedBox").innerHTML = `<div><b>${esc(r.name)}</b><small>${esc(r.address || r.town)}</small></div><a href="${mapsUrl(r)}" target="_blank" rel="noopener">Open in Google Maps</a>`;
@@ -412,15 +498,22 @@ function addRestaurant(p){
 }
 
 /* ---------- posting ---------- */
-$("#postForm").addEventListener("submit", e => {
+$("#postForm").addEventListener("submit", async e => {
   e.preventDefault();
   const id = $("#pRest").value, soup = $("#pSoup").value.trim();
   if (!id || id === "__new"){ $("#toast").textContent = "Pick or add the restaurant first."; return; }
   if (!soup){ $("#toast").textContent = "Add the soup name, then post."; $("#pSoup").focus(); return; }
-  const by = $("#pRole").value, old = day.soups[id];
-  if (by === "customer" && old && old.by === "restaurant"){ $("#toast").textContent = "The restaurant already posted today's soup. Tap ✓ on it if it's right."; return; }
-  day.soups[id] = {soup, special:$("#pSpecial").value.trim() || null, by, checks:0, mine:false, ts:Date.now()};
-  persist(); renderSoups();
+  const btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true; $("#toast").textContent = "Posting…";
+  try {
+    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null, $("#pRole").value);
+  } catch(err){
+    btn.disabled = false;
+    $("#toast").textContent = /already posted/.test(err.message) ? "The restaurant already posted today's soup. Tap ✓ on it if it's right." : err.message;
+    return;
+  }
+  btn.disabled = false;
+  saveLocal(); renderSoups();
   $("#toast").textContent = "Posted.";
   $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pickedBox").hidden = true;
   $("#pPreview").hidden = true; $("#snapNote").textContent = "Or just type it below.";
@@ -455,7 +548,13 @@ document.querySelectorAll(".seasons button").forEach(b => b.addEventListener("cl
 setSeason(seasonFor(new Date()));
 
 $("#soupDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+$("#footNote").textContent = REMOTE ? "Early version. Everyone sees the same soups. Soups clear each night." : "Early version. Restaurants and soups you add are saved on this device only for now.";
 renderPicker(); renderSoups();
+if (REMOTE){
+  refresh();
+  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+}
 </script>
 </body>
 </html>
