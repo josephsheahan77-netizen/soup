@@ -219,8 +219,8 @@ footer{color:var(--ink-soft);font-size:12px}
             <input id="pSoup" type="text" placeholder="e.g. Tomato bisque" maxlength="40" autocomplete="off">
           </div>
           <div class="field">
-            <label for="pSpecial">Other specials (optional)</label>
-            <input id="pSpecial" type="text" placeholder="e.g. Grilled cheese on sourdough" maxlength="60" autocomplete="off">
+            <label for="pSpecial">Other soups &amp; specials (optional)</label>
+            <input id="pSpecial" type="text" placeholder="e.g. Split pea, grilled cheese special" maxlength="60" autocomplete="off">
           </div>
           <div class="field">
             <label for="pRole">I'm posting as</label>
@@ -246,8 +246,8 @@ footer{color:var(--ink-soft);font-size:12px}
         </div>
         <div class="phone" aria-label="Example reminder">
           <div class="phead" id="pHead">Gorge Bowl · 10:30 am</div>
-          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the name or a photo of the board. Add any specials too.</div>
-          <div class="bubble out">Tomato bisque. Special is half sandwich + cup</div>
+          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the soup or a photo of the board. Add a second soup or specials too.</div>
+          <div class="bubble out">Tomato bisque and split pea. Special is half sandwich + cup</div>
           <div class="bubble in">Posted! Reply FIX to change it.</div>
         </div>
       </div>
@@ -392,7 +392,7 @@ function renderSoups(){
     <article class="soup">
       <div class="where"><span>${esc(r.name)}</span><small>${esc(r.town || "")}${s ? " · " + ago(s.ts) : ""} · <a href="${mapsUrl(r)}" target="_blank" rel="noopener">Map</a></small></div>
       ${s ? `<h3>${esc(s.soup)}</h3>` : `<h3 class="none">No soup posted yet today</h3>`}
-      ${s && s.special ? `<div class="special"><b>Special:</b> ${esc(s.special)}</div>` : ""}
+      ${s && s.special ? `<div class="special"><b>Also today:</b> ${esc(s.special)}</div>` : ""}
       <div class="verify">
         ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
@@ -552,7 +552,7 @@ function renderReminder(){
   const email = $("#rHow").value === "Email", t = $("#rTime").value;
   $("#pHead").textContent = (email ? "Email from Gorge Bowl · " : "Gorge Bowl · ") + t;
   $("#rMsg").textContent = email ? "Subject: What's the soup today? Hit reply with the soup name or attach a photo of the board."
-                                 : "Morning! What's the soup today? Reply with the name or a photo of the board. Add any specials too.";
+                                 : "Morning! What's the soup today? Reply with the soup or a photo of the board. Add a second soup or specials too.";
 }
 $("#rHow").addEventListener("change", renderReminder);
 $("#rTime").addEventListener("change", renderReminder);
