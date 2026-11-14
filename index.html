@@ -78,6 +78,8 @@ main .wrap{padding-block:22px 48px;display:grid;gap:22px}
 .soup h3.none{font-size:16px;font-weight:500;color:var(--ink-soft);font-family:var(--font-body)}
 .special{font-size:14px;color:var(--ink-soft);margin-top:4px}
 .special b{font-weight:600;color:var(--ink)}
+.yest{font-size:14px;color:var(--ink-soft);margin-top:2px}
+.yest b{font-weight:600}
 .verify{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}
 .who{font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--line);color:var(--ink-soft)}
 .who.restaurant{background:var(--a1);border-color:var(--a1);color:#fff}
@@ -296,6 +298,7 @@ function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e
 let restaurants = [];                   // {id,name,town,address,lat,lon}
 let soups = {};                         // restaurant id -> {id,soup,special,by,checks,ts}
 let checked = load("gb.checked", {});   // soup ids this device has checked
+let yesterday = {};                     // restaurant id -> yesterday's last soup
 let loaded = !REMOTE, loadError = "";
 
 if (!REMOTE){
@@ -320,18 +323,22 @@ async function api(path, body){
   if (!res.ok) throw new Error((data && (data.message || data.hint)) || "Couldn't reach the soup database.");
   return data;
 }
+const yesterdayKey = () => { const d = new Date(todayKey() + "T12:00:00"); d.setDate(d.getDate() - 1); return d.toLocaleDateString("en-CA"); };
 const toSoup = row => ({id:row.id, soup:row.soup, special:row.special, by:row.posted_by, checks:row.checks, ts:Date.parse(row.created_at)});
 
 async function refresh(){
   if (!REMOTE) return;
   try {
-    const [rs, ss] = await Promise.all([
+    const [rs, ss, ys] = await Promise.all([
       api("restaurants?select=id,name,town,address,lat,lon&order=name"),
-      api("todays_soups?select=*")
+      api("todays_soups?select=*"),
+      api("soups?select=restaurant_id,soup,special,created_at&day=eq." + yesterdayKey() + "&order=created_at.desc").catch(() => [])
     ]);
     if (!Array.isArray(rs) || !Array.isArray(ss)) throw new Error("The soup database sent back something unexpected.");
     restaurants = rs;
     soups = Object.fromEntries(ss.map(r => [r.restaurant_id, toSoup(r)]));
+    yesterday = {};
+    (Array.isArray(ys) ? ys : []).forEach(r => { if (!yesterday[r.restaurant_id]) yesterday[r.restaurant_id] = r; });
     loaded = true; loadError = "";
   } catch(e){ loadError = e.message; }
   const keep = $("#pRest").value;
@@ -359,7 +366,10 @@ const store = {
 let townFilter = "all", editing = null;
 
 /* ---------- soup list ---------- */
-const ago = ts => { const m = Math.max(1, Math.round((Date.now() - ts)/60000)); return m < 60 ? m + " min ago" : Math.round(m/60) + " hr ago"; };
+const timeStr = ts => new Date(ts).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}).replace(" AM"," am").replace(" PM"," pm");
+/* Daily rotation: everyone sees the same order all day, and it reshuffles each morning,
+   so no restaurant is stuck at the top or the bottom. */
+const rank = id => { let h = 2166136261; for (const c of todayKey() + id){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 function flash(msg){ const p = $("#soupMsg"); p.textContent = msg; p.hidden = false; clearTimeout(flash.t); flash.t = setTimeout(() => p.hidden = true, 5000); }
 
 function renderFilters(){
@@ -385,19 +395,20 @@ function renderSoups(){
   const list = restaurants
     .filter(r => townFilter==="all" || r.town===townFilter)
     .map(r => ({r, s: soups[r.id]}))
-    .sort((a,b) => (b.s ? b.s.ts : 0) - (a.s ? a.s.ts : 0) || a.r.name.localeCompare(b.r.name));
+    .sort((a,b) => (!!b.s - !!a.s) || (a.s ? rank(a.r.id) - rank(b.r.id) : a.r.name.localeCompare(b.r.name)));
   $("#soupList").innerHTML = list.map(({r,s}) => {
     const mine = s && checked[s.id];
     return `
     <article class="soup">
-      <div class="where"><span>${esc(r.name)}</span><small>${esc(r.town || "")}${s ? " · " + ago(s.ts) : ""} · <a href="${mapsUrl(r)}" target="_blank" rel="noopener">Map</a></small></div>
+      <div class="where"><span>${esc(r.name)}</span><small>${esc(r.town || "")}${s ? " · posted " + timeStr(s.ts) : ""} · <a href="${mapsUrl(r)}" target="_blank" rel="noopener">Map</a></small></div>
       ${s ? `<h3>${esc(s.soup)}</h3>` : `<h3 class="none">No soup posted yet today</h3>`}
+      ${!s && yesterday[r.id] ? `<div class="yest">Yesterday: <b>${esc(yesterday[r.id].soup)}</b>${yesterday[r.id].special ? " · " + esc(yesterday[r.id].special) : ""}</div>` : ""}
       ${s && s.special ? `<div class="special"><b>Also today:</b> ${esc(s.special)}</div>` : ""}
       <div class="verify">
         ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
         ${s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
-        : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Post the soup</button>`}
+        : `${yesterday[r.id] ? `<button type="button" class="check" data-act="same" data-id="${r.id}">✓ Same soup today</button>` : ""}<button type="button" class="link" data-act="fix" data-id="${r.id}">${yesterday[r.id] ? "Different soup?" : "Post the soup"}</button>`}
       </div>
       ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
     </article>`; }).join("") || `<p>No restaurants in that town yet.</p>`;
@@ -415,6 +426,16 @@ $("#soupList").addEventListener("click", async e => {
   if (act === "retry"){ loadError = ""; renderSoups(); return refresh(); }
   const id = b.dataset.id, s = soups[id];
   if (act === "fix"){ editing = editing === id ? null : id; return renderSoups(); }
+  if (act === "same" && yesterday[id]){
+    b.disabled = true;
+    try {
+      const ns = await store.postSoup(id, yesterday[id].soup, yesterday[id].special, "customer");
+      soups[id] = ns; checked[ns.id] = 1; ns.checks = 1; saveLocal();
+      const n = await store.check(ns.id, 1); if (typeof n === "number") ns.checks = n;
+    }
+    catch(err){ flash(err.message + "."); refresh(); }
+    return renderSoups();
+  }
   if (act === "check" && s){
     const delta = checked[s.id] ? -1 : 1;
     if (delta > 0) checked[s.id] = 1; else delete checked[s.id];
@@ -569,7 +590,14 @@ function setSeason(s){
 document.querySelectorAll(".seasons button").forEach(b => b.addEventListener("click", () => setSeason(b.dataset.s)));
 setSeason(seasonFor(new Date()));
 
-$("#soupDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+let shownDay = "";
+function setDay(){
+  shownDay = todayKey();
+  $("#soupDate").textContent = "Soups for " + new Date(shownDay + "T12:00:00").toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+}
+setDay();
+/* If the app is left open past midnight, roll over to the new day. */
+function checkNewDay(){ if (todayKey() !== shownDay){ setDay(); if (!REMOTE){ soups = {}; } refresh(); renderSoups(); } }
 $("#footNote").textContent = REMOTE ? "Early version. Everyone sees the same soups. Soups clear each night." : "Early version. Restaurants and soups you add are saved on this device only for now.";
 renderPicker(); renderSoups();
 if (REMOTE){
@@ -577,6 +605,8 @@ if (REMOTE){
   setInterval(() => { if (!document.hidden) refresh(); }, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 }
+setInterval(checkNewDay, 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNewDay(); });
 </script>
 </body>
 </html>
