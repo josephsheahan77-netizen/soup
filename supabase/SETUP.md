@@ -36,3 +36,35 @@ Until it's set up, the app still works but saves only on each device.
 ## Housekeeping
 - To remove a restaurant or a bad post: Supabase → **Table Editor** → `restaurants` or `soups` → select the row → delete. Deleting a restaurant also deletes its soups.
 - Free projects pause after a week with no visits. If that happens, open the project in Supabase and click **Restore**.
+
+# Turning on the photo reader (snap the soup board)
+
+When someone snaps a photo of the soup board, the app sends it to a small function in your
+Supabase project. That function asks Claude (Anthropic's AI) to read the board and fills in the
+soup for them. Until this is set up, the app still works: people just type the soup.
+
+## 1. Get an Anthropic API key
+1. Go to **platform.claude.com** and sign up.
+2. Add a little prepaid credit under **Billing** (start with $5).
+3. Under **Settings → Limits**, set a **monthly spend limit** (for example $20) so costs can never surprise you.
+4. Open **API Keys** → **Create Key**, name it `gorge-bowl`, and copy it (starts with `sk-ant-`).
+   Keep it private: it goes only into Supabase, never into the app or GitHub.
+
+## 2. Add the key to Supabase
+1. In Supabase, open **Edge Functions** → **Secrets** (sometimes under **Project Settings → Edge Functions**).
+2. Add a secret named `ANTHROPIC_API_KEY` with the key as its value. Save.
+
+## 3. Create the function
+1. In Supabase, open **Edge Functions** → **Deploy a new function** → **Via Editor**.
+2. Name it exactly `read-soup-board`.
+3. Replace the sample code with everything in [`functions/read-soup-board/index.ts`](functions/read-soup-board/index.ts) and click **Deploy**.
+4. Open the function's **Details** (or settings) and turn **off** "Verify JWT" / "Enforce JWT verification".
+   The app's public key isn't the kind that check expects. The function protects itself instead:
+   it only answers the Gorge Bowl site, rejects oversized photos, and your spend limit caps costs.
+
+## 4. Try it
+Open the app on your phone, tap **Post a soup** → **Snap the soup board**, and take a photo of a board.
+In a few seconds the soup should fill in with "Read from the board. Check it, then tap Post."
+
+## Cost
+Each photo costs roughly 1 to 2 cents. 50 photos a day is about $15 to $30 a month.

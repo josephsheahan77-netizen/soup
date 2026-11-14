@@ -108,6 +108,7 @@ input,select{font:400 16px var(--font-body);color:var(--ink);background:var(--ca
 .snap:focus-within .snapbtn{outline:3px solid var(--a1);outline-offset:2px}
 #pPreview{width:72px;height:72px;object-fit:cover;border-radius:8px;max-width:100%}
 #snapNote{font-size:13px;opacity:.85}
+.pnote{font-size:13px;opacity:.9;margin:0}
 
 .finder{background:var(--card);color:var(--ink);border-radius:10px;padding:12px;display:grid;gap:8px}
 .finder .field > label{color:var(--ink)}
@@ -189,6 +190,7 @@ footer{color:var(--ink-soft);font-size:12px}
             <img id="pPreview" alt="Photo of the soup board" hidden>
             <span id="snapNote">Or just type it below.</span>
           </div>
+          <p class="pnote" id="whereNote" hidden></p>
 
           <div class="field">
             <label for="pRest">Restaurant</label>
@@ -559,14 +561,97 @@ $("#postForm").addEventListener("submit", async e => {
   saveLocal(); renderSoups();
   $("#toast").textContent = "Posted.";
   $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pickedBox").hidden = true;
-  $("#pPreview").hidden = true; $("#snapNote").textContent = "Or just type it below.";
+  $("#pPreview").hidden = true; $("#snapNote").textContent = "Or just type it below."; $("#whereNote").hidden = true;
   setTimeout(() => { $("#toast").textContent = ""; showView("soup"); }, 800);
 });
+/* ---------- snap the board: find where you are, then read the soup ---------- */
 $("#pPhoto").addEventListener("change", e => {
   const f = e.target.files && e.target.files[0]; if (!f) return;
   $("#pPreview").src = URL.createObjectURL(f); $("#pPreview").hidden = false;
-  $("#snapNote").textContent = "Got the photo. Reading the board is coming soon, so type the soup below for now.";
+  e.target.value = "";
+  findWhereIAm();
+  readBoard(f);
 });
+
+/* Shrink the photo before sending: smaller is faster on a phone connection and plenty for reading a board. */
+function shrinkPhoto(file, maxSide = 1400){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      resolve(c.toDataURL("image/jpeg", 0.82).split(",")[1]);
+    };
+    img.onerror = () => reject(new Error("Couldn't open that photo."));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function readBoard(file){
+  if (!REMOTE){ $("#snapNote").textContent = "Got the photo. Type the soup below."; return; }
+  $("#snapNote").textContent = "Reading the board…";
+  try {
+    const image = await shrinkPhoto(file);
+    const headers = {"apikey": DB_KEY, "Content-Type": "application/json"};
+    if (DB_KEY.startsWith("eyJ")) headers["Authorization"] = "Bearer " + DB_KEY;
+    const res = await fetch(DB_URL.replace(/\/+$/, "") + "/functions/v1/read-soup-board", {
+      method: "POST", headers, body: JSON.stringify({image, media_type: "image/jpeg"}) });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data) throw new Error((data && data.error) || "Couldn't read the board. Type the soup in below.");
+    if (!data.readable){ $("#snapNote").textContent = "Couldn't find a soup on that photo. Type it in below."; return; }
+    $("#pSoup").value = data.soup;
+    if (data.other) $("#pSpecial").value = data.other;
+    $("#snapNote").textContent = "Read from the board. Check it, then tap Post.";
+  } catch(err){
+    $("#snapNote").textContent = err.message === "Failed to fetch" ? "Couldn't reach the photo reader. Type the soup in below." : err.message;
+  }
+}
+
+/* Use the phone's location to pick the restaurant you're standing in. */
+const metersBetween = (a, b) => {
+  const R = 6371000, rad = d => d * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat/2)**2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
+function findWhereIAm(){
+  if (!navigator.geolocation) return;
+  $("#whereNote").hidden = false; $("#whereNote").textContent = "Finding where you are…";
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const here = {lat: pos.coords.latitude, lon: pos.coords.longitude};
+    const near = restaurants.filter(r => typeof r.lat === "number" && typeof r.lon === "number")
+      .map(r => ({r, d: metersBetween(here, r)})).sort((a,b) => a.d - b.d)[0];
+    if (near && near.d <= 150){
+      renderPicker(near.r.id); $("#pickedBox").hidden = true;
+      $("#whereNote").textContent = `Looks like you're at ${near.r.name}. Change it below if not.`;
+      return;
+    }
+    /* Not a saved restaurant yet: offer the places right here. */
+    try {
+      const res = await fetch(`https://photon.komoot.io/reverse?lat=${here.lat}&lon=${here.lon}&radius=0.15&limit=8&lang=en`);
+      const data = await res.json();
+      const found = (data.features || []).filter(f => f.properties && f.properties.name && f.properties.osm_key === "amenity").map(f => {
+        const p = f.properties, town = p.city || p.town || p.village || p.district || p.county || "";
+        const street = [p.housenumber, p.street].filter(Boolean).join(" ");
+        return { name:p.name, town, address:[street, town].filter(Boolean).join(", "),
+                 lat:f.geometry.coordinates[1], lon:f.geometry.coordinates[0], kind:(p.osm_value || "").replace(/_/g," ") };
+      });
+      if (!found.length) throw new Error("none");
+      renderPicker("__new"); $("#pickedBox").hidden = true; $("#manualBox").hidden = true;
+      places = found; $("#placeQ").value = "";
+      $("#placeHint").textContent = "Places right where you are. Tap the right one.";
+      $("#placeResults").innerHTML = found.map((p,i) => `<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><small>${esc([p.kind, p.address || p.town].filter(Boolean).join(" · "))}</small></button></li>`).join("");
+      $("#whereNote").textContent = "This spot isn't in Gorge Bowl yet. Pick it below to add it.";
+    } catch(e){
+      $("#whereNote").textContent = "Couldn't tell which restaurant you're at. Pick it below.";
+    }
+  }, () => {
+    $("#whereNote").textContent = "Pick the restaurant below. (Turn on location to have it picked for you.)";
+  }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
+}
 
 /* ---------- reminder mockup ---------- */
 function renderReminder(){
