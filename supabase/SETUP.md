@@ -39,6 +39,8 @@ Until it's set up, the app still works but saves only on each device.
 
 # Turning on the photo reader (snap the soup board)
 
+**Currently off.** After the steps below, set `const PHOTO_READER = true;` near the top of the script in `index.html` and commit.
+
 When someone snaps a photo of the soup board, the app sends it to a small function in your
 Supabase project. That function asks Claude (Anthropic's AI) to read the board and fills in the
 soup for them. Until this is set up, the app still works: people just type the soup.

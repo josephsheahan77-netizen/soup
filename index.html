@@ -287,6 +287,9 @@ footer{color:var(--ink-soft);font-size:12px}
 const DB_URL = "https://tejtuiucbhaszlxolkou.supabase.co";
 const DB_KEY = "sb_publishable_5TJ0qE7DynhKzA1Et5-VdQ__rbgAS_6";
 const REMOTE = !!(DB_URL && DB_KEY);
+/* Photo reader (reads the soup off a board photo; costs about 1-2 cents a photo).
+   Off for now. To turn it on, set up the function in supabase/SETUP.md, then change this to true. */
+const PHOTO_READER = false;
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -591,7 +594,7 @@ function shrinkPhoto(file, maxSide = 1400){
 }
 
 async function readBoard(file){
-  if (!REMOTE){ $("#snapNote").textContent = "Got the photo. Type the soup below."; return; }
+  if (!REMOTE || !PHOTO_READER){ $("#snapNote").textContent = "Got the photo. Type the soup below."; return; }
   $("#snapNote").textContent = "Reading the board…";
   try {
     const image = await shrinkPhoto(file);
