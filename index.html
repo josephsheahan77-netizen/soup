@@ -143,6 +143,14 @@ ul.facts{margin:0;padding-left:20px;display:grid;gap:6px;max-width:60ch}
 .how h4{margin:0 0 4px;font-family:var(--font-display);font-size:16px}
 .how p{margin:0;font-size:13px;color:var(--ink-soft)}
 footer{color:var(--ink-soft);font-size:12px}
+/* Sponsor banner: one small strip pinned to the bottom. Never covers the list (body gets matching space). */
+body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.sponsor{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);
+  padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  display:flex;flex-direction:column;align-items:center;gap:2px;transition:background-color .8s ease,border-color .8s ease}
+.sponsor small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.sponsor a{display:block;line-height:0;border-radius:6px;overflow:hidden}
+.sponsor img{display:block;width:320px;max-width:calc(100vw - 32px);height:auto;aspect-ratio:320/50}
 
 @media (max-width:600px){
   .how,.remind,.manual{grid-template-columns:1fr}
@@ -314,6 +322,11 @@ footer{color:var(--ink-soft);font-size:12px}
   </div>
 </main>
 
+<aside class="sponsor" id="sponsor" aria-label="Local sponsor" hidden>
+  <small>Local sponsor</small>
+  <a id="sponsorLink" href="#" target="_blank" rel="noopener sponsored"><img id="sponsorImg" alt="" width="320" height="50"></a>
+</aside>
+
 <script>
 /* ---------- community settings ----------
    Local Bowl is built to serve more than one community. Everything specific to a place
@@ -327,7 +340,11 @@ const COMMUNITY = {
   area: "around the Gorge",                   // used in phrases like "places around the Gorge"
   timeZone: "America/Los_Angeles",            // when "today" starts and ends
   search: {lat: 45.70, lon: -121.50, bbox: "-122.20,45.45,-120.80,45.95"},  // map area for place search
-  towns: ["Hood River", "White Salmon", "Bingen", "The Dalles", "Mosier", "Cascade Locks", "Parkdale", "Stevenson", "Lyle"]
+  towns: ["Hood River", "White Salmon", "Bingen", "The Dalles", "Mosier", "Cascade Locks", "Parkdale", "Stevenson", "Lyle"],
+  /* This month's sponsors. Each one is a 320 x 50 banner (see SPONSORS.md). The banner shows one
+     at a time, in random order, switching every 20 seconds. Empty list = no banner at all.
+     Example: {name: "Everybody's Brewing", image: "sponsors/everybodys.png", link: "https://..."} */
+  sponsors: []
 };
 /* ---------- shared database (Supabase) ----------
    Fill these two in from Supabase: Project Settings > API.
@@ -717,6 +734,24 @@ function applySeason(d = new Date()){
     : `The colors follow the seasons. Right now: ${season}.`;
 }
 applySeason();
+
+/* ---------- sponsor banner ---------- */
+(function startSponsors(){
+  const list = (COMMUNITY.sponsors || []).filter(x => x && x.image && x.name);
+  if (!list.length) return;
+  for (let i = list.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+  let n = 0;
+  const show = () => {
+    const sp = list[n % list.length];
+    $("#sponsorImg").src = sp.image; $("#sponsorImg").alt = sp.name;
+    $("#sponsorLink").href = sp.link || "#";
+    $("#sponsorLink").setAttribute("aria-label", sp.name + (sp.link ? " (opens their site)" : ""));
+    n++;
+  };
+  show();
+  $("#sponsor").hidden = false; document.body.classList.add("has-sponsor");
+  if (list.length > 1) setInterval(() => { if (!document.hidden) show(); }, 20000);
+})();
 
 /* Fill in the community's name and details. */
 document.querySelectorAll('[data-c="name"]').forEach(el => el.textContent = COMMUNITY.name);
