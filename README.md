@@ -2,7 +2,7 @@
 
 > Some days you just want a good cup of soup. Some days you just need to dance. Here's the place to find out where.
 >
-> Why this exists and the rules it keeps: [MISSION.md](MISSION.md)
+> Why this exists and the rules it keeps: [MISSION.md](MISSION.md) · What's next: [ROADMAP.md](ROADMAP.md)
 
 Soups around the Gorge: today's soup at lunch spots from Hood River to The Dalles.
 
