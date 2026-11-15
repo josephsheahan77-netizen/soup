@@ -21,6 +21,11 @@ type the soup (or the band), done. Information only. Nothing to argue about.
   posts show "Posted by the restaurant" for real.
 - Daily reminder by text or email: reply with the soup and it posts.
 - Customers never need an account.
+- Owner list is private: you (Joe) add a restaurant's email or phone after they say yes. Only you can see it.
+- Until automatic reminders are set up, send the morning "what's the soup?" text by hand to pilot restaurants.
+
+**Sponsors**
+- Season sponsor line at the top ("Spring on Gorge Bowl is brought to you by ___"), $250 a season. See PITCH.md.
 
 ## Later
 - **"I want chicken noodle"**: type a soup and see who has it today. If nobody does, gently show what's close ("No chicken noodle today, but here's what's warm right now: tomato bisque, chicken tortilla..."). Results are never paid for.

@@ -26,6 +26,11 @@ Be the name people see while they decide where lunch is today.
 Bring something fun. A drawing, a pun, your dog, this week's special. It's your square
 (well, rectangle) of the town.
 
+## Season sponsor (one per season)
+One business presents each season: "Spring on Gorge Bowl is brought to you by ___", shown at the top
+of the app, plus their banner in the sponsor strip in colors made to fit the season. **$250 a season.**
+*(The season-sponsor line at the top still needs to be built.)*
+
 ## Price
 *(Starting point to try in Hood River; adjust once we see what works.)*
 - **$50 a month** per sponsor, up to 5 sponsors per town.
