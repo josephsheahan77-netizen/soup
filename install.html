@@ -2,122 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Add Gorge Bowl to your phone</title>
-<meta name="description" content="Put Gorge Bowl on your home screen in a few taps, on iPhone or Android.">
-<meta name="theme-color" content="#1f3a2b">
-<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap">
-<style>
-:root{
-  color-scheme: light;
-  --ink:#141414; --ink-soft:#4a4a44;
-  --band:#1f3a2b; --band-ink:#f7ecd6;
-  --ground:#f6e6cb; --card:#fffaf1; --line:#e2c9a0;
-  --a1:#c4561f; --a2:#b3261e; --a3:#e8b23a;
-  --font-display:"Bricolage Grotesque","Inter",system-ui,sans-serif;
-  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.5 var(--font-body)}
-.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{background:var(--band);color:var(--band-ink);padding-top:env(safe-area-inset-top,0px)}
-header .wrap{padding-block:22px 20px;display:flex;align-items:center;gap:12px}
-header img{width:52px;height:auto;flex:none}
-header h1{margin:0;font:800 clamp(24px,6.5vw,32px)/1.1 var(--font-display);letter-spacing:-.01em}
-header p{margin:4px 0 0;opacity:.85;font-size:15px}
-.stripes{display:flex;height:6px}
-.stripes span{flex:1}
-.stripes span:nth-child(1){background:var(--a2)}
-.stripes span:nth-child(2){background:var(--a1)}
-.stripes span:nth-child(3){background:var(--a3)}
-main .wrap{padding-block:22px 40px;display:grid;gap:18px}
-.tabs{display:flex;gap:6px}
-.tabs button{flex:1;font:700 16px var(--font-display);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px;border-radius:10px;cursor:pointer}
-.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--card)}
-button:focus-visible,a:focus-visible{outline:3px solid var(--a1);outline-offset:2px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
-.card h2{margin:0;font:700 20px var(--font-display)}
-ol{margin:0;padding:0;list-style:none;counter-reset:step;display:grid;gap:14px}
-ol li{counter-increment:step;display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start}
-ol li::before{content:counter(step);display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--a1);color:#fff;font:700 15px var(--font-display)}
-.key{display:inline-flex;align-items:center;gap:4px;font-weight:600;background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:0 6px;white-space:nowrap}
-.key svg{width:15px;height:15px}
-.tip{margin:0;font-size:14px;color:var(--ink-soft)}
-.done{display:grid;gap:6px}
-.done p{margin:0}
-.btn{display:inline-block;font:700 16px var(--font-display);background:var(--a1);color:#fff;text-decoration:none;border-radius:10px;padding:12px 18px;justify-self:start}
-footer{font-size:13px;color:var(--ink-soft)}
-</style>
+<meta http-equiv="refresh" content="0; url=./#howto">
+<style>body{margin:0;padding:24px 16px;background:#f6e6cb;color:#141414;font:16px/1.5 system-ui,sans-serif}a{color:#141414;font-weight:600}</style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <img src="icons/mark.svg" alt="" width="52" height="52">
-    <div>
-      <h1>Add Gorge Bowl to your phone</h1>
-      <p>One tap from your home screen, like any other app.</p>
-    </div>
-  </div>
-  <div class="stripes"><span></span><span></span><span></span></div>
-</header>
-
-<main>
-  <div class="wrap">
-    <div class="tabs" role="tablist" aria-label="Your phone">
-      <button role="tab" id="tab-iphone" aria-selected="true" aria-controls="iphone">iPhone</button>
-      <button role="tab" id="tab-android" aria-selected="false" aria-controls="android">Android</button>
-    </div>
-
-    <section class="card" id="iphone" role="tabpanel" aria-labelledby="tab-iphone">
-      <h2>iPhone</h2>
-      <ol>
-        <li><span>Open <b>josephsheahan77-netizen.github.io/soup</b> in <b>Safari</b> (or scan the Gorge Bowl QR code with your camera).</span></li>
-        <li><span>Tap the <span class="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</span> button. On newer iPhones, tap <span class="key">•••</span> first, then <b>Share</b>.</span></li>
-        <li><span>Scroll down and tap <span class="key">Add to Home Screen</span>.</span></li>
-        <li><span>Tap <span class="key">Add</span> in the top corner.</span></li>
-      </ol>
-      <p class="tip">Don't see Add to Home Screen? Make sure you're in Safari, then scroll the list all the way down or tap <b>Edit Actions</b> to find it.</p>
-    </section>
-
-    <section class="card" id="android" role="tabpanel" aria-labelledby="tab-android" hidden>
-      <h2>Android</h2>
-      <ol>
-        <li><span>Open <b>josephsheahan77-netizen.github.io/soup</b> in <b>Chrome</b> (or scan the Gorge Bowl QR code with your camera).</span></li>
-        <li><span>Tap the <span class="key">⋮</span> menu in the top-right corner.</span></li>
-        <li><span>Tap <span class="key">Add to Home screen</span> (some phones say <span class="key">Install app</span>).</span></li>
-        <li><span>Tap <span class="key">Install</span> or <span class="key">Add</span>.</span></li>
-      </ol>
-      <p class="tip">Using Samsung Internet? Tap the <b>≡</b> menu, then <b>Add page to</b> → <b>Home screen</b>.</p>
-    </section>
-
-    <section class="card done">
-      <h2>That's it</h2>
-      <p>Look for the soup bowl icon on your home screen. Tap it any day to see what's in the soup pots around the Gorge.</p>
-      <a class="btn" href="./">Open Gorge Bowl</a>
-    </section>
-
-    <footer>Gorge Bowl is free. There's nothing to download from an app store and no account to make.</footer>
-  </div>
-</main>
-
-<script>
-const tabs = [...document.querySelectorAll('[role="tab"]')];
-function show(id){
-  tabs.forEach(t => {
-    const on = t.getAttribute("aria-controls") === id;
-    t.setAttribute("aria-selected", on);
-    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
-  });
-}
-tabs.forEach(t => t.addEventListener("click", () => show(t.getAttribute("aria-controls"))));
-/* Show the right steps for the phone that opened the page. */
-if (/android/i.test(navigator.userAgent)) show("android");
-</script>
+<p>The home screen steps are now in the Gorge Bowl app. <a href="./#howto">Open them here</a>.</p>
 </body>
 </html>

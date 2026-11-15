@@ -26,9 +26,6 @@
   --ground:#f6e6cb; --card:#fffaf1; --line:#e2c9a0;
   --a1:#c4561f; --a2:#b3261e; --a3:#e8b23a;
 }
-body[data-season="winter"]{ --band:#24425a; --band-ink:#f4f9fc; --ground:#edf4f9; --card:#ffffff; --line:#c9dbe8; --a1:#2f6f9f; --a2:#24425a; --a3:#bcd9ee; }
-body[data-season="spring"]{ --band:#35603a; --band-ink:#fff7f5; --ground:#fcf0ee; --card:#fffdfb; --line:#efcfd2; --a1:#c8331f; --a2:#f0be2c; --a3:#f2a9b9; }
-body[data-season="summer"]{ --band:#2a6c8c; --band-ink:#fbfdff; --ground:#eef7fb; --card:#ffffff; --line:#cfe3ec; --a1:#d2692b; --a2:#5f9e46; --a3:#f6c65c; }
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -44,21 +41,17 @@ header .wrap{padding-block:22px 0;display:grid;gap:14px}
 .mark{width:clamp(44px,11vw,60px);height:auto;flex:none}
 html{-webkit-text-size-adjust:100%}
 body{-webkit-tap-highlight-color:transparent}
-button,.snapbtn,.chip{touch-action:manipulation}
+button,.chip{touch-action:manipulation}
 .stripes{display:flex;height:6px}
 .stripes span{flex:1;transition:background-color .8s ease}
 .stripes span:nth-child(1){background:var(--a2)}
 .stripes span:nth-child(2){background:var(--a1)}
 .stripes span:nth-child(3){background:var(--a3)}
 
-.seasons{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.seasons span{font-size:12px;color:var(--ink-soft);margin-right:2px}
-.seasons button{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);background:transparent;color:var(--ink-soft);padding:5px 9px;border-radius:999px;cursor:pointer}
-.seasons button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--card)}
 .foot{display:grid;gap:12px}
 
 nav.tabs{display:flex;gap:4px}
-nav.tabs button{font:700 15px var(--font-display);background:transparent;border:0;color:var(--band-ink);opacity:.7;padding:10px 14px 12px;cursor:pointer;border-radius:10px 10px 0 0}
+nav.tabs button{font:700 15px var(--font-display);background:transparent;border:0;color:var(--band-ink);opacity:.7;padding:10px 12px 12px;white-space:nowrap;cursor:pointer;border-radius:10px 10px 0 0}
 nav.tabs button[aria-selected="true"]{background:var(--ground);color:var(--ink);opacity:1}
 button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--a1);outline-offset:2px}
 
@@ -102,13 +95,22 @@ form.post{display:grid;gap:12px}
 .field{display:grid;gap:4px}
 .field > label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 input,select{font:400 16px var(--font-body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;width:100%}
-.snap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.snap input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
-.snapbtn{font:700 15px var(--font-display);background:var(--band-ink);color:var(--band);border-radius:8px;padding:11px 16px;cursor:pointer}
-.snap:focus-within .snapbtn{outline:3px solid var(--a1);outline-offset:2px}
-#pPreview{width:72px;height:72px;object-fit:cover;border-radius:8px;max-width:100%}
-#snapNote{font-size:13px;opacity:.85}
 .pnote{font-size:13px;opacity:.9;margin:0}
+.locbtn{font:600 14px var(--font-body);background:transparent;color:var(--band-ink);border:1px solid color-mix(in srgb,var(--band-ink) 45%,transparent);border-radius:999px;padding:7px 14px;cursor:pointer;justify-self:start}
+/* How to tab */
+.guide{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;transition:background-color .8s ease,border-color .8s ease}
+.guide h2{margin:0;font-family:var(--font-display);font-size:20px}
+.guide p{margin:0;color:var(--ink-soft);max-width:60ch}
+.phonepick{display:flex;gap:6px}
+.phonepick button{flex:1;font:700 15px var(--font-display);border:1px solid var(--line);background:var(--ground);color:var(--ink);padding:9px;border-radius:10px;cursor:pointer}
+.phonepick button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--card)}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:step;display:grid;gap:12px}
+ol.steps li{counter-increment:step;display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start}
+ol.steps li::before{content:counter(step);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--a1);color:#fff;font:700 14px var(--font-display)}
+.key{display:inline-flex;align-items:center;gap:4px;font-weight:600;background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:0 6px;white-space:nowrap}
+.key svg{width:15px;height:15px}
+.tip{font-size:14px}
+ul.facts{margin:0;padding-left:20px;display:grid;gap:6px;max-width:60ch}
 
 .finder{background:var(--card);color:var(--ink);border-radius:10px;padding:12px;display:grid;gap:8px}
 .finder .field > label{color:var(--ink)}
@@ -148,7 +150,7 @@ footer{color:var(--ink-soft);font-size:12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-<body data-season="fall">
+<body>
 <header>
   <div class="wrap">
     <div class="brand">
@@ -163,6 +165,7 @@ footer{color:var(--ink-soft);font-size:12px}
     <nav class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-view="soup">Soup today</button>
       <button role="tab" aria-selected="false" data-view="post">Post a soup</button>
+      <button role="tab" aria-selected="false" data-view="howto">How to</button>
     </nav>
   </div>
   <div class="stripes"><span></span><span></span><span></span></div>
@@ -182,14 +185,9 @@ footer{color:var(--ink-soft);font-size:12px}
     <section id="view-post" class="stack" hidden>
       <div class="panel">
         <h2>Post today's soup</h2>
-        <p>Snap the soup board or type it in. Soups clear at the end of the day, so tomorrow starts fresh.</p>
+        <p>Type in today's soup. Soups clear at the end of the day, so tomorrow starts fresh.</p>
         <form class="post" id="postForm" novalidate>
-          <div class="snap">
-            <label for="pPhoto" class="snapbtn">Snap the soup board</label>
-            <input id="pPhoto" type="file" accept="image/*" capture="environment">
-            <img id="pPreview" alt="Photo of the soup board" hidden>
-            <span id="snapNote">Or just type it below.</span>
-          </div>
+          <button type="button" class="locbtn" id="findMe">Use my location to pick the restaurant</button>
           <p class="pnote" id="whereNote" hidden></p>
 
           <div class="field">
@@ -240,7 +238,7 @@ footer{color:var(--ink-soft);font-size:12px}
       <div class="remind">
         <div>
           <h2>Daily soup reminder</h2>
-          <p>Coming soon. Each restaurant that signs up gets a nudge every morning. Reply with the soup, or a photo of the board, and it posts.</p>
+          <p>Coming soon. Each restaurant that signs up gets a nudge every morning. Reply with the soup and it posts.</p>
           <div class="rfields">
             <label for="rHow">Send it by</label>
             <select id="rHow"><option>Text</option><option>Email</option></select>
@@ -250,32 +248,70 @@ footer{color:var(--ink-soft);font-size:12px}
         </div>
         <div class="phone" aria-label="Example reminder">
           <div class="phead" id="pHead">Gorge Bowl · 10:30 am</div>
-          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the soup or a photo of the board. Add a second soup or specials too.</div>
+          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the soup, plus a second soup or specials if you have them.</div>
           <div class="bubble out">Tomato bisque and split pea. Special is half sandwich + cup</div>
           <div class="bubble in">Posted! Reply FIX to change it.</div>
         </div>
       </div>
     </section>
 
-    <section aria-labelledby="howTitle" class="stack">
-      <h2 id="howTitle" style="font-family:var(--font-display);font-size:18px;margin:0">How it works</h2>
-      <div class="how">
-        <div><h4>Anyone can post</h4><p>Staff or customers post the soup by typing it or snapping the board. The restaurant's own post always wins.</p></div>
-        <div><h4>Customers check it</h4><p>See the same soup? Tap ✓. Different soup? Fix it. The checks show how sure the listing is.</p></div>
-        <div><h4>No comments, no reviews</h4><p>People can post a soup or check it. That's it. No ratings, no complaints.</p></div>
+    <section id="view-howto" class="stack" hidden>
+      <div class="guide" id="homescreen">
+        <h2>Put Gorge Bowl on your home screen</h2>
+        <p>It works like any other app, with no app store and no account.</p>
+        <div class="phonepick" role="tablist" aria-label="Your phone">
+          <button role="tab" aria-selected="true" data-phone="iphone">iPhone</button>
+          <button role="tab" aria-selected="false" data-phone="android">Android</button>
+        </div>
+        <ol class="steps" id="steps-iphone">
+          <li><span>Open Gorge Bowl in <b>Safari</b>.</span></li>
+          <li><span>Tap the <span class="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</span> button. On newer iPhones, tap <span class="key">•••</span> first, then <b>Share</b>.</span></li>
+          <li><span>Scroll down and tap <span class="key">Add to Home Screen</span>.</span></li>
+          <li><span>Tap <span class="key">Add</span>.</span></li>
+        </ol>
+        <ol class="steps" id="steps-android" hidden>
+          <li><span>Open Gorge Bowl in <b>Chrome</b>.</span></li>
+          <li><span>Tap the <span class="key">⋮</span> menu in the top-right corner.</span></li>
+          <li><span>Tap <span class="key">Add to Home screen</span> (some phones say <span class="key">Install app</span>).</span></li>
+          <li><span>Tap <span class="key">Install</span> or <span class="key">Add</span>.</span></li>
+        </ol>
+        <p class="tip" id="tip-iphone">Don't see Add to Home Screen? Make sure you're in Safari, then scroll the list all the way down.</p>
+        <p class="tip" id="tip-android" hidden>Using Samsung Internet? Tap the <b>≡</b> menu, then <b>Add page to</b> → <b>Home screen</b>.</p>
+      </div>
+
+      <div class="guide">
+        <h2>Post today's soup</h2>
+        <ol class="steps">
+          <li><span>Tap <b>Post a soup</b>.</span></li>
+          <li><span>Pick the restaurant, or tap <b>Use my location</b> when you're there. Not listed? Pick <b>+ Add a restaurant</b> and search for it.</span></li>
+          <li><span>Type the soup, plus any second soup or specials.</span></li>
+          <li><span>Say whether you work there or you're a customer, then tap <b>Post soup</b>.</span></li>
+        </ol>
+      </div>
+
+      <div class="guide">
+        <h2>Check a soup</h2>
+        <ul class="facts">
+          <li>See the same soup on the board? Tap <b>✓ That's right</b>. The count shows how many people agree.</li>
+          <li>Different soup? Tap <b>Different soup?</b> and type the right one.</li>
+          <li>Each morning starts fresh. If yesterday's soup is still on, tap <b>✓ Same soup today</b>.</li>
+        </ul>
+      </div>
+
+      <div class="guide">
+        <h2>The house rules</h2>
+        <ul class="facts">
+          <li>A soup posted by the restaurant always wins over a customer's post.</li>
+          <li>No comments, no reviews, no ratings. Just soup.</li>
+          <li>Soups clear every night. The colors follow the seasons.</li>
+        </ul>
       </div>
     </section>
 
     <footer class="foot">
       <span id="footNote">Early version.</span>
-      <a href="install.html" style="color:var(--ink);font-weight:600">Add Gorge Bowl to your home screen</a>
-      <div class="seasons" role="group" aria-label="Preview season colors">
-        <span>Preview colors:</span>
-        <button type="button" data-s="fall">Fall</button>
-        <button type="button" data-s="winter">Winter</button>
-        <button type="button" data-s="spring">Spring</button>
-        <button type="button" data-s="summer">Summer</button>
-      </div>
+      <span id="seasonNote"></span>
+      <button type="button" class="link" id="goHowto" style="color:var(--ink);font-weight:600;justify-self:start;padding:0">Add Gorge Bowl to your home screen</button>
     </footer>
   </div>
 </main>
@@ -288,9 +324,6 @@ footer{color:var(--ink-soft);font-size:12px}
 const DB_URL = "https://tejtuiucbhaszlxolkou.supabase.co";
 const DB_KEY = "sb_publishable_5TJ0qE7DynhKzA1Et5-VdQ__rbgAS_6";
 const REMOTE = !!(DB_URL && DB_KEY);
-/* Photo reader (reads the soup off a board photo; costs about 1-2 cents a photo).
-   Off for now. To turn it on, set up the function in supabase/SETUP.md, then change this to true. */
-const PHOTO_READER = false;
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -463,11 +496,19 @@ $("#soupList").addEventListener("submit", async e => {
 
 /* ---------- views ---------- */
 function showView(v){
-  ["soup","post"].forEach(n => { $("#view-"+n).hidden = n!==v; });
+  ["soup","post","howto"].forEach(n => { $("#view-"+n).hidden = n!==v; });
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view===v));
   window.scrollTo(0,0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
+$("#goHowto").addEventListener("click", () => showView("howto"));
+/* Home screen steps: show the ones for this phone. */
+function showPhone(ph){
+  document.querySelectorAll(".phonepick button").forEach(b => b.setAttribute("aria-selected", b.dataset.phone === ph));
+  ["iphone","android"].forEach(n => { $("#steps-"+n).hidden = n !== ph; $("#tip-"+n).hidden = n !== ph; });
+}
+document.querySelectorAll(".phonepick button").forEach(b => b.addEventListener("click", () => showPhone(b.dataset.phone)));
+if (/android/i.test(navigator.userAgent)) showPhone("android");
 
 /* ---------- restaurant picker ---------- */
 function renderPicker(sel){
@@ -565,55 +606,9 @@ $("#postForm").addEventListener("submit", async e => {
   saveLocal(); renderSoups();
   $("#toast").textContent = "Posted.";
   $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pickedBox").hidden = true;
-  $("#pPreview").hidden = true; $("#snapNote").textContent = "Or just type it below."; $("#whereNote").hidden = true;
+  $("#whereNote").hidden = true;
   setTimeout(() => { $("#toast").textContent = ""; showView("soup"); }, 800);
 });
-/* ---------- snap the board: find where you are, then read the soup ---------- */
-$("#pPhoto").addEventListener("change", e => {
-  const f = e.target.files && e.target.files[0]; if (!f) return;
-  $("#pPreview").src = URL.createObjectURL(f); $("#pPreview").hidden = false;
-  e.target.value = "";
-  findWhereIAm();
-  readBoard(f);
-});
-
-/* Shrink the photo before sending: smaller is faster on a phone connection and plenty for reading a board. */
-function shrinkPhoto(file, maxSide = 1400){
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(img.src);
-      resolve(c.toDataURL("image/jpeg", 0.82).split(",")[1]);
-    };
-    img.onerror = () => reject(new Error("Couldn't open that photo."));
-    img.src = URL.createObjectURL(file);
-  });
-}
-
-async function readBoard(file){
-  if (!REMOTE || !PHOTO_READER){ $("#snapNote").textContent = "Got the photo. Type the soup below."; return; }
-  $("#snapNote").textContent = "Reading the board…";
-  try {
-    const image = await shrinkPhoto(file);
-    const headers = {"apikey": DB_KEY, "Content-Type": "application/json"};
-    if (DB_KEY.startsWith("eyJ")) headers["Authorization"] = "Bearer " + DB_KEY;
-    const res = await fetch(DB_URL.replace(/\/+$/, "") + "/functions/v1/read-soup-board", {
-      method: "POST", headers, body: JSON.stringify({image, media_type: "image/jpeg"}) });
-    const data = await res.json().catch(() => null);
-    if (!res.ok || !data) throw new Error((data && data.error) || "Couldn't read the board. Type the soup in below.");
-    if (!data.readable){ $("#snapNote").textContent = "Couldn't find a soup on that photo. Type it in below."; return; }
-    $("#pSoup").value = data.soup;
-    if (data.other) $("#pSpecial").value = data.other;
-    $("#snapNote").textContent = "Read from the board. Check it, then tap Post.";
-  } catch(err){
-    $("#snapNote").textContent = err.message === "Failed to fetch" ? "Couldn't reach the photo reader. Type the soup in below." : err.message;
-  }
-}
-
 /* Use the phone's location to pick the restaurant you're standing in. */
 const metersBetween = (a, b) => {
   const R = 6371000, rad = d => d * Math.PI / 180;
@@ -653,9 +648,10 @@ function findWhereIAm(){
       $("#whereNote").textContent = "Couldn't tell which restaurant you're at. Pick it below.";
     }
   }, () => {
-    $("#whereNote").textContent = "Pick the restaurant below. (Turn on location to have it picked for you.)";
+    $("#whereNote").textContent = "Location is off for this site. Pick the restaurant below.";
   }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
 }
+$("#findMe").addEventListener("click", findWhereIAm);
 
 /* ---------- reminder mockup ---------- */
 function renderReminder(){
@@ -667,17 +663,47 @@ function renderReminder(){
 $("#rHow").addEventListener("change", renderReminder);
 $("#rTime").addEventListener("change", renderReminder);
 
-/* ---------- seasons ---------- */
-function seasonFor(d){ const md = (d.getMonth()+1)*100 + d.getDate();
-  if (md >= 1221 || md < 320) return "winter"; if (md < 621) return "spring"; if (md < 922) return "summer"; return "fall"; }
-function setSeason(s){
-  document.body.dataset.season = s;
-  document.querySelectorAll(".seasons button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s===s));
-  const band = getComputedStyle(document.body).getPropertyValue("--band").trim();
-  document.querySelector('meta[name="theme-color"]').setAttribute("content", band);
+/* ---------- seasons ----------
+   The colors follow the calendar. Each season holds its own palette, and over the last
+   three weeks before the next season starts, the colors slowly blend into the next one. */
+const PALETTES = {
+  winter: {band:"#24425a", bandInk:"#f4f9fc", ground:"#edf4f9", card:"#ffffff", line:"#c9dbe8", a1:"#2f6f9f", a2:"#24425a", a3:"#bcd9ee"},
+  spring: {band:"#35603a", bandInk:"#fff7f5", ground:"#fcf0ee", card:"#fffdfb", line:"#efcfd2", a1:"#c8331f", a2:"#f0be2c", a3:"#f2a9b9"},
+  summer: {band:"#2a6c8c", bandInk:"#fbfdff", ground:"#eef7fb", card:"#ffffff", line:"#cfe3ec", a1:"#d2692b", a2:"#5f9e46", a3:"#f6c65c"},
+  fall:   {band:"#1f3a2b", bandInk:"#f7ecd6", ground:"#f6e6cb", card:"#fffaf1", line:"#e2c9a0", a1:"#c4561f", a2:"#b3261e", a3:"#e8b23a"}
+};
+/* Season start dates: equinoxes and solstices (month is 0-based). */
+const SEASON_STARTS = [["spring",2,20],["summer",5,21],["fall",8,22],["winter",11,21]];
+const BLEND_DAYS = 21;
+const VAR_NAMES = {band:"--band", bandInk:"--band-ink", ground:"--ground", card:"--card", line:"--line", a1:"--a1", a2:"--a2", a3:"--a3"};
+
+function seasonState(d){
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const starts = [];
+  for (const y of [day.getFullYear() - 1, day.getFullYear(), day.getFullYear() + 1])
+    for (const [name, m, dd] of SEASON_STARTS) starts.push({name, at: new Date(y, m, dd)});
+  starts.sort((a,b) => a.at - b.at);
+  let i = starts.findIndex(s => s.at > day) - 1;
+  const cur = starts[i], next = starts[i + 1];
+  const daysLeft = Math.round((next.at - day) / 86400000);
+  const t = daysLeft <= BLEND_DAYS ? (BLEND_DAYS - daysLeft + 1) / (BLEND_DAYS + 1) : 0;
+  return {season: cur.name, next: next.name, t};
 }
-document.querySelectorAll(".seasons button").forEach(b => b.addEventListener("click", () => setSeason(b.dataset.s)));
-setSeason(seasonFor(new Date()));
+function mixHex(a, b, t){
+  const p = h => [1,3,5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return "#" + x.map((v, k) => Math.round(v + (y[k] - v) * t).toString(16).padStart(2, "0")).join("");
+}
+function applySeason(d = new Date()){
+  const {season, next, t} = seasonState(d);
+  const from = PALETTES[season], to = PALETTES[next];
+  for (const k in VAR_NAMES) document.body.style.setProperty(VAR_NAMES[k], mixHex(from[k], to[k], t));
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", mixHex(from.band, to.band, t));
+  $("#seasonNote").textContent = t > 0
+    ? `The colors follow the seasons. Right now: ${season}, turning to ${next}.`
+    : `The colors follow the seasons. Right now: ${season}.`;
+}
+applySeason();
 
 let shownDay = "";
 function setDay(){
@@ -686,9 +712,10 @@ function setDay(){
 }
 setDay();
 /* If the app is left open past midnight, roll over to the new day. */
-function checkNewDay(){ if (todayKey() !== shownDay){ setDay(); if (!REMOTE){ soups = {}; } refresh(); renderSoups(); } }
+function checkNewDay(){ if (todayKey() !== shownDay){ setDay(); applySeason(); if (!REMOTE){ soups = {}; } refresh(); renderSoups(); } }
 $("#footNote").textContent = REMOTE ? "Early version. Everyone sees the same soups. Soups clear each night." : "Early version. Restaurants and soups you add are saved on this device only for now.";
 renderPicker(); renderSoups();
+if (location.hash === "#howto") showView("howto");
 if (REMOTE){
   refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, 60000);
