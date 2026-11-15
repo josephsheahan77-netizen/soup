@@ -23,7 +23,7 @@ type the soup (or the band), done. Information only. Nothing to argue about.
 - Customers never need an account.
 
 ## Later
-- **"I want chicken noodle"**: type a soup and see who has it today.
+- **"I want chicken noodle"**: type a soup and see who has it today. If nobody does, gently show what's close ("No chicken noodle today, but here's what's warm right now: tomato bisque, chicken tortilla..."). Results are never paid for.
 - **Tonight tab**: music, theater, markets. Anyone posts; the venue's post wins; events disappear after they happen.
 - **Seasonal joy**: small seasonal touches beyond color, such as a local wildflower or snowflake drawing that fits each region.
 - **More towns**: a community column in the database, one address per town (localbowl.com/teton), each town sees only its own.

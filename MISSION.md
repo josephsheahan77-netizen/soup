@@ -4,6 +4,15 @@
 > Some days you just need to dance.
 > Here's the place to find out where.**
 
+## Joy, and being generous
+
+The point is joy: the small, real kind. You wanted chicken noodle, nobody has it today, but
+there's tomato bisque down the street, and that's pretty good too. You got close to what you wanted
+and you're happy. The app should feel like that every time you open it.
+
+So we stay **generous, not clever**. Nothing in the app tries to trick, upsell, or steer anyone.
+When someone asks for a soup, they get the honest answer, and money never changes that answer.
+
 ## Who it's for
 
 The person who works Monday through Friday and wants to know where lunch is today without
