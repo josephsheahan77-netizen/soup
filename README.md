@@ -16,3 +16,16 @@ What works now:
 Not yet:
 - The daily text/email reminder is shown but not working yet.
 - The events/music tab is parked for later.
+
+## Local Bowl: more communities
+
+Gorge Bowl is the first community of **Local Bowl**. Everything specific to the Gorge
+(name, tagline, towns, map area for place search, time zone) lives in the `COMMUNITY`
+block at the top of the script in `index.html`. Changing that block is all it takes to
+make, say, **North Coast Bowl** or **Teton Valley Bowl**.
+
+Still to do before a second community launches:
+- **One database for all communities:** add a `community` column to restaurants so each
+  community only sees its own, and let "today" follow each community's time zone
+  (the database currently uses Pacific time; Teton Valley is on Mountain time).
+- **One address per community**, e.g. `localbowl.app/gorge`, with its own QR code and home screen name.

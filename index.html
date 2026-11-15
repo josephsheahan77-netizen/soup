@@ -157,8 +157,8 @@ footer{color:var(--ink-soft);font-size:12px}
       <div class="title">
         <img class="mark" src="icons/mark.svg" alt="" width="56" height="56">
         <div>
-          <h1>Gorge Bowl</h1>
-          <p>Soups around the Gorge</p>
+          <h1 data-c="name">Gorge Bowl</h1>
+          <p data-c="tagline">Soups around the Gorge</p>
         </div>
       </div>
     </div>
@@ -201,14 +201,12 @@ footer{color:var(--ink-soft);font-size:12px}
               <input id="placeQ" type="search" placeholder="Start typing, e.g. Everybody's Brewing" autocomplete="off">
             </div>
             <ul class="results" id="placeResults" aria-live="polite"></ul>
-            <p class="note" id="placeHint">Type at least 3 letters to search places around the Gorge.</p>
+            <p class="note" id="placeHint"></p>
             <div id="manualBox" hidden>
               <p class="note" style="margin-bottom:6px">Not showing up? Add it by name:</p>
               <div class="manual">
                 <input id="manName" type="text" placeholder="Restaurant name" maxlength="50" aria-label="Restaurant name">
-                <select id="manTown" aria-label="Town">
-                  <option>Hood River</option><option>White Salmon</option><option>Bingen</option><option>The Dalles</option><option>Mosier</option><option>Cascade Locks</option><option>Parkdale</option><option>Stevenson</option><option>Lyle</option>
-                </select>
+                <select id="manTown" aria-label="Town"></select>
               </div>
               <div class="row" style="margin-top:8px"><button type="button" class="btn" id="manAdd">Add restaurant</button></div>
             </div>
@@ -247,7 +245,7 @@ footer{color:var(--ink-soft);font-size:12px}
           </div>
         </div>
         <div class="phone" aria-label="Example reminder">
-          <div class="phead" id="pHead">Gorge Bowl · 10:30 am</div>
+          <div class="phead" id="pHead"><span data-c="name">Gorge Bowl</span> · 10:30 am</div>
           <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the soup, plus a second soup or specials if you have them.</div>
           <div class="bubble out">Tomato bisque and split pea. Special is half sandwich + cup</div>
           <div class="bubble in">Posted! Reply FIX to change it.</div>
@@ -257,20 +255,20 @@ footer{color:var(--ink-soft);font-size:12px}
 
     <section id="view-howto" class="stack" hidden>
       <div class="guide" id="homescreen">
-        <h2>Put Gorge Bowl on your home screen</h2>
+        <h2>Put <span data-c="name">Gorge Bowl</span> on your home screen</h2>
         <p>It works like any other app, with no app store and no account.</p>
         <div class="phonepick" role="tablist" aria-label="Your phone">
           <button role="tab" aria-selected="true" data-phone="iphone">iPhone</button>
           <button role="tab" aria-selected="false" data-phone="android">Android</button>
         </div>
         <ol class="steps" id="steps-iphone">
-          <li><span>Open Gorge Bowl in <b>Safari</b>.</span></li>
+          <li><span>Open <span data-c="name">Gorge Bowl</span> in <b>Safari</b>.</span></li>
           <li><span>Tap the <span class="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</span> button. On newer iPhones, tap <span class="key">•••</span> first, then <b>Share</b>.</span></li>
           <li><span>Scroll down and tap <span class="key">Add to Home Screen</span>.</span></li>
           <li><span>Tap <span class="key">Add</span>.</span></li>
         </ol>
         <ol class="steps" id="steps-android" hidden>
-          <li><span>Open Gorge Bowl in <b>Chrome</b>.</span></li>
+          <li><span>Open <span data-c="name">Gorge Bowl</span> in <b>Chrome</b>.</span></li>
           <li><span>Tap the <span class="key">⋮</span> menu in the top-right corner.</span></li>
           <li><span>Tap <span class="key">Add to Home screen</span> (some phones say <span class="key">Install app</span>).</span></li>
           <li><span>Tap <span class="key">Install</span> or <span class="key">Add</span>.</span></li>
@@ -311,12 +309,26 @@ footer{color:var(--ink-soft);font-size:12px}
     <footer class="foot">
       <span id="footNote">Early version.</span>
       <span id="seasonNote"></span>
-      <button type="button" class="link" id="goHowto" style="color:var(--ink);font-weight:600;justify-self:start;padding:0">Add Gorge Bowl to your home screen</button>
+      <button type="button" class="link" id="goHowto" style="color:var(--ink);font-weight:600;justify-self:start;padding:0">Add <span data-c="name">Gorge Bowl</span> to your home screen</button>
     </footer>
   </div>
 </main>
 
 <script>
+/* ---------- community settings ----------
+   Local Bowl is built to serve more than one community. Everything specific to a place
+   lives here. To start another one (North Coast Bowl, Teton Valley Bowl, ...), copy this
+   block and change the values. */
+const COMMUNITY = {
+  id: "gorge",
+  name: "Gorge Bowl",
+  tagline: "Soups around the Gorge",
+  description: "Today's soup at lunch spots around the Columbia River Gorge.",
+  area: "around the Gorge",                   // used in phrases like "places around the Gorge"
+  timeZone: "America/Los_Angeles",            // when "today" starts and ends
+  search: {lat: 45.70, lon: -121.50, bbox: "-122.20,45.45,-120.80,45.95"},  // map area for place search
+  towns: ["Hood River", "White Salmon", "Bingen", "The Dalles", "Mosier", "Cascade Locks", "Parkdale", "Stevenson", "Lyle"]
+};
 /* ---------- shared database (Supabase) ----------
    Fill these two in from Supabase: Project Settings > API.
    The key is the "anon" / "publishable" key, which is meant to be public.
@@ -327,7 +339,7 @@ const REMOTE = !!(DB_URL && DB_KEY);
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const todayKey = () => new Date().toLocaleDateString("en-CA", {timeZone:"America/Los_Angeles"});
+const todayKey = () => new Date().toLocaleDateString("en-CA", {timeZone: COMMUNITY.timeZone});
 const mapsUrl = r => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([r.name, r.address || r.town].filter(Boolean).join(", "));
 
 /* ---------- device storage ---------- */
@@ -527,18 +539,19 @@ $("#pRest").addEventListener("change", () => {
 function startAdd(){
   showView("post"); renderPicker("__new"); $("#pickedBox").hidden = true;
   $("#placeQ").value = ""; $("#placeResults").innerHTML = ""; $("#manualBox").hidden = true;
-  $("#placeHint").textContent = "Type at least 3 letters to search places around the Gorge.";
+  $("#placeHint").textContent = SEARCH_HINT;
   $("#placeQ").focus();
 }
 $("#goAdd").addEventListener("click", startAdd);
 
-/* Place search: Photon, a free OpenStreetMap search, biased to the Gorge. */
-const GORGE = {lat:45.70, lon:-121.50, bbox:"-122.20,45.45,-120.80,45.95"};
+/* Place search: Photon, a free OpenStreetMap search, limited to the community's area. */
+const AREA = COMMUNITY.search;
+const SEARCH_HINT = `Type at least 3 letters to search places ${COMMUNITY.area}.`;
 let searchTimer = null, searchSeq = 0, places = [];
 $("#placeQ").addEventListener("input", () => {
   clearTimeout(searchTimer);
   const q = $("#placeQ").value.trim();
-  if (q.length < 3){ $("#placeResults").innerHTML = ""; $("#placeHint").textContent = "Type at least 3 letters to search places around the Gorge."; $("#manualBox").hidden = true; return; }
+  if (q.length < 3){ $("#placeResults").innerHTML = ""; $("#placeHint").textContent = SEARCH_HINT; $("#manualBox").hidden = true; return; }
   $("#placeHint").textContent = "Searching…";
   searchTimer = setTimeout(() => search(q), 300);
 });
@@ -546,7 +559,7 @@ async function search(q){
   const seq = ++searchSeq;
   let found = [];
   try {
-    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=${GORGE.lat}&lon=${GORGE.lon}&bbox=${GORGE.bbox}&limit=8&lang=en`;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=${AREA.lat}&lon=${AREA.lon}&bbox=${AREA.bbox}&limit=8&lang=en`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
@@ -562,7 +575,7 @@ async function search(q){
   $("#manualBox").hidden = false;
   if (found === null){ places = []; $("#placeResults").innerHTML = ""; $("#placeHint").textContent = "Place search isn't reachable right now. You can add it by name below."; return; }
   places = found;
-  $("#placeHint").textContent = found.length ? "Tap the right one." : "No matches around the Gorge.";
+  $("#placeHint").textContent = found.length ? "Tap the right one." : `No matches ${COMMUNITY.area}.`;
   $("#placeResults").innerHTML = found.map((p,i) => `<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><small>${esc([p.kind, p.address || p.town].filter(Boolean).join(" · "))}</small></button></li>`).join("");
 }
 $("#placeResults").addEventListener("click", e => {
@@ -643,7 +656,7 @@ function findWhereIAm(){
       places = found; $("#placeQ").value = "";
       $("#placeHint").textContent = "Places right where you are. Tap the right one.";
       $("#placeResults").innerHTML = found.map((p,i) => `<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><small>${esc([p.kind, p.address || p.town].filter(Boolean).join(" · "))}</small></button></li>`).join("");
-      $("#whereNote").textContent = "This spot isn't in Gorge Bowl yet. Pick it below to add it.";
+      $("#whereNote").textContent = `This spot isn't in ${COMMUNITY.name} yet. Pick it below to add it.`;
     } catch(e){
       $("#whereNote").textContent = "Couldn't tell which restaurant you're at. Pick it below.";
     }
@@ -656,7 +669,7 @@ $("#findMe").addEventListener("click", findWhereIAm);
 /* ---------- reminder mockup ---------- */
 function renderReminder(){
   const email = $("#rHow").value === "Email", t = $("#rTime").value;
-  $("#pHead").textContent = (email ? "Email from Gorge Bowl · " : "Gorge Bowl · ") + t;
+  $("#pHead").textContent = (email ? `Email from ${COMMUNITY.name} · ` : `${COMMUNITY.name} · `) + t;
   $("#rMsg").textContent = email ? "Subject: What's the soup today? Hit reply with the soup name or attach a photo of the board."
                                  : "Morning! What's the soup today? Reply with the soup or a photo of the board. Add a second soup or specials too.";
 }
@@ -704,6 +717,15 @@ function applySeason(d = new Date()){
     : `The colors follow the seasons. Right now: ${season}.`;
 }
 applySeason();
+
+/* Fill in the community's name and details. */
+document.querySelectorAll('[data-c="name"]').forEach(el => el.textContent = COMMUNITY.name);
+document.querySelectorAll('[data-c="tagline"]').forEach(el => el.textContent = COMMUNITY.tagline);
+document.title = COMMUNITY.name;
+document.querySelector('meta[name="description"]').setAttribute("content", COMMUNITY.description);
+document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", COMMUNITY.name);
+$("#placeHint").textContent = SEARCH_HINT;
+$("#manTown").innerHTML = COMMUNITY.towns.map(t => `<option>${esc(t)}</option>`).join("");
 
 let shownDay = "";
 function setDay(){
