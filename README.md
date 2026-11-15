@@ -1,5 +1,9 @@
 # Gorge Bowl
 
+> Some days you just want a good cup of soup. Some days you just need to dance. Here's the place to find out where.
+>
+> Why this exists and the rules it keeps: [MISSION.md](MISSION.md)
+
 Soups around the Gorge: today's soup at lunch spots from Hood River to The Dalles.
 
 Open `index.html` in a browser, or visit the GitHub Pages link once Pages is turned on.
