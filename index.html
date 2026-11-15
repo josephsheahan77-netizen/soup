@@ -122,6 +122,9 @@ ul.facts{margin:0;padding-left:20px;display:grid;gap:6px;max-width:60ch}
 .picked{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);color:var(--ink);border-radius:10px;padding:10px 12px}
 .picked small{display:block;color:var(--ink-soft)}
 .picked a{color:var(--ink-soft);font-size:13px}
+.owner{display:grid;gap:10px}
+.ownerbtns{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap}
+.owner .btn{color:#fff;font-size:14px;text-decoration:none}
 .toast{font-size:14px}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 
@@ -194,6 +197,13 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
       <div class="panel">
         <h2>Post today's soup</h2>
         <p>Type in today's soup. Soups clear at the end of the day, so tomorrow starts fresh.</p>
+        <div class="picked owner" id="ownerBar" hidden>
+          <div><b>Posting as <span id="ownerName"></span></b><small>Your posts show as "Posted by the restaurant" and lock your soup for the day.</small></div>
+          <div class="ownerbtns">
+            <a class="btn" id="remindBtn" href="reminder.ics">Remind me every morning</a>
+            <button type="button" class="link" id="ownerOff">Not this restaurant? Remove from this phone</button>
+          </div>
+        </div>
         <form class="post" id="postForm" novalidate>
           <button type="button" class="locbtn" id="findMe">Use my location to pick the restaurant</button>
           <p class="pnote" id="whereNote" hidden></p>
@@ -229,10 +239,6 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
           <div class="field">
             <label for="pSpecial">Other soups &amp; specials (optional)</label>
             <input id="pSpecial" type="text" placeholder="e.g. Split pea, grilled cheese special" maxlength="60" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="pRole">I'm posting as</label>
-            <select id="pRole"><option value="restaurant">Someone who works there</option><option value="customer">A customer</option></select>
           </div>
           <div class="row">
             <button type="submit" class="btn">Post soup</button>
@@ -291,7 +297,16 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
           <li><span>Tap <b>Post a soup</b>.</span></li>
           <li><span>Pick the restaurant, or tap <b>Use my location</b> when you're there. Not listed? Pick <b>+ Add a restaurant</b> and search for it.</span></li>
           <li><span>Type the soup, plus any second soup or specials.</span></li>
-          <li><span>Say whether you work there or you're a customer, then tap <b>Post soup</b>.</span></li>
+          <li><span>Tap <b>Post soup</b>.</span></li>
+        </ol>
+      </div>
+
+      <div class="guide">
+        <h2>For restaurants</h2>
+        <ol class="steps">
+          <li><span>Ask Joe for your restaurant's private link.</span></li>
+          <li><span>Open it on the phone you'll post from. That phone now posts as your restaurant, and customers can't change your soup.</span></li>
+          <li><span>Tap <b>Remind me every morning</b> to get a 9:30 reminder in your phone's calendar.</span></li>
         </ol>
       </div>
 
@@ -409,8 +424,7 @@ async function refresh(){
     (Array.isArray(ys) ? ys : []).forEach(r => { if (!yesterday[r.restaurant_id]) yesterday[r.restaurant_id] = r; });
     loaded = true; loadError = "";
   } catch(e){ loadError = e.message; }
-  const keep = $("#pRest").value;
-  renderSoups(); renderPicker(keep);
+  renderSoups(); renderPicker(currentPick());
 }
 
 const store = {
@@ -419,8 +433,13 @@ const store = {
     let r = restaurants.find(x => x.name.toLowerCase() === p.name.toLowerCase() && (x.town||"") === (p.town||""));
     return r || {id:"r" + Date.now().toString(36), name:p.name, town:p.town || "", address:p.address || "", lat:p.lat, lon:p.lon};
   },
-  async postSoup(rid, soup, special, by){
-    if (REMOTE) return toSoup(await api("rpc/post_soup", {p_restaurant_id:rid, p_soup:soup, p_special:special, p_posted_by:by}));
+  async postSoup(rid, soup, special){
+    const by = isOwnerOf(rid) ? "restaurant" : "customer";
+    if (REMOTE){
+      const body = {p_restaurant_id:rid, p_soup:soup, p_special:special};
+      if (by === "restaurant") body.p_key = owner.key;
+      return toSoup(await api("rpc/post_soup", body));
+    }
     const old = soups[rid];
     if (by === "customer" && old && old.by === "restaurant") throw new Error("The restaurant already posted today's soup");
     return {id:"s" + Date.now().toString(36), soup, special, by, checks:0, ts:Date.now()};
@@ -432,6 +451,9 @@ const store = {
 };
 
 let townFilter = "all", editing = null;
+/* Restaurant mode: a phone that opened the restaurant's private link. */
+let owner = load("gb.owner", null);   // {key, id, name}
+const isOwnerOf = rid => !!(owner && owner.id === rid);
 
 /* ---------- soup list ---------- */
 const timeStr = ts => new Date(ts).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}).replace(" AM"," am").replace(" PM"," pm");
@@ -475,7 +497,7 @@ function renderSoups(){
       <div class="verify">
         ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
-        ${s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
+        ${isOwnerOf(r.id) ? `<button type="button" class="link" data-act="fix" data-id="${r.id}">Update our soup</button>` : s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
         : `${yesterday[r.id] ? `<button type="button" class="check" data-act="same" data-id="${r.id}">✓ Same soup today</button>` : ""}<button type="button" class="link" data-act="fix" data-id="${r.id}">${yesterday[r.id] ? "Different soup?" : "Post the soup"}</button>`}
       </div>
       ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
@@ -497,7 +519,7 @@ $("#soupList").addEventListener("click", async e => {
   if (act === "same" && yesterday[id]){
     b.disabled = true;
     try {
-      const ns = await store.postSoup(id, yesterday[id].soup, yesterday[id].special, "customer");
+      const ns = await store.postSoup(id, yesterday[id].soup, yesterday[id].special);
       soups[id] = ns; checked[ns.id] = 1; ns.checks = 1; saveLocal();
       const n = await store.check(ns.id, 1); if (typeof n === "number") ns.checks = n;
     }
@@ -518,7 +540,7 @@ $("#soupList").addEventListener("submit", async e => {
   const v = $("#fixIn").value.trim(); if (!v) return;
   const id = e.target.dataset.id, old = soups[id];
   try {
-    soups[id] = await store.postSoup(id, v, old ? old.special : null, "customer");
+    soups[id] = await store.postSoup(id, v, old ? old.special : null);
     editing = null; saveLocal(); renderSoups();
   } catch(err){ editing = null; flash(err.message + "."); refresh(); renderSoups(); }
 });
@@ -540,10 +562,18 @@ document.querySelectorAll(".phonepick button").forEach(b => b.addEventListener("
 if (/android/i.test(navigator.userAgent)) showPhone("android");
 
 /* ---------- restaurant picker ---------- */
+/* What the picker should keep showing when the lists reload: a real pick stays, "add new" stays
+   only while someone is adding one, and otherwise it falls back to the restaurant's own (if any). */
+function currentPick(){
+  const v = $("#pRest").value;
+  if (v === "__new") return ($("#placeQ").value || $("#placeResults").children.length) ? "__new" : undefined;
+  return v || undefined;
+}
 function renderPicker(sel){
   const opts = restaurants.slice().sort((a,b) => a.name.localeCompare(b.name))
     .map(r => `<option value="${r.id}">${esc(r.name)}${r.town ? " · " + esc(r.town) : ""}</option>`).join("");
   $("#pRest").innerHTML = (restaurants.length ? `<option value="">Pick a restaurant</option>` : "") + opts + `<option value="__new">+ Add a restaurant</option>`;
+  if (!sel && owner && restaurants.some(r => r.id === owner.id)) sel = owner.id;
   const valid = sel && (sel === "__new" || restaurants.some(r => r.id === sel));
   $("#pRest").value = valid ? sel : (restaurants.length ? "" : "__new");
   $("#addBox").hidden = $("#pRest").value !== "__new";
@@ -626,7 +656,7 @@ $("#postForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]");
   btn.disabled = true; $("#toast").textContent = "Posting…";
   try {
-    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null, $("#pRole").value);
+    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null);
   } catch(err){
     btn.disabled = false;
     $("#toast").textContent = /already posted/.test(err.message) ? "The restaurant already posted today's soup. Tap ✓ on it if it's right." : err.message;
@@ -773,6 +803,45 @@ function checkNewDay(){ if (todayKey() !== shownDay){ setDay(); applySeason(); i
 $("#footNote").textContent = REMOTE ? "Early version. Everyone sees the same soups. Soups clear each night." : "Early version. Restaurants and soups you add are saved on this device only for now.";
 renderPicker(); renderSoups();
 if (location.hash === "#howto") showView("howto");
+if (location.hash === "#post") showView("post");
+
+/* ---------- restaurant links ---------- */
+function showOwner(){
+  $("#ownerBar").hidden = !owner;
+  if (owner) $("#ownerName").textContent = owner.name;
+}
+async function checkOwnerKey(key, fromLink){
+  if (!REMOTE) return;
+  try {
+    const rows = await api("rpc/restaurant_for_key", {p_key: key});
+    const r = Array.isArray(rows) ? rows[0] : null;
+    if (r){
+      owner = {key, id: r.id, name: r.name}; save("gb.owner", owner);
+      if (fromLink) showView("post");
+    } else {
+      owner = null; save("gb.owner", null);
+      if (fromLink) flash("That restaurant link doesn't work anymore. Ask Joe for a new one.");
+    }
+  } catch(e){ if (fromLink) flash("Couldn't check that restaurant link. Try opening it again."); }
+  showOwner(); renderPicker(currentPick()); renderSoups();
+}
+$("#ownerOff").addEventListener("click", () => {
+  owner = null; save("gb.owner", null); showOwner(); renderPicker(); renderSoups();
+});
+showOwner();
+function readLinkInHash(){
+  if (!location.hash.startsWith("#r=")) return false;
+  const key = decodeURIComponent(location.hash.slice(3));
+  history.replaceState(null, "", location.pathname + location.search);   // don't leave the key in the address bar
+  checkOwnerKey(key, true);
+  return true;
+}
+window.addEventListener("hashchange", () => {
+  if (readLinkInHash()) return;
+  if (location.hash === "#post") showView("post");
+  if (location.hash === "#howto") showView("howto");
+});
+if (!readLinkInHash() && owner) checkOwnerKey(owner.key, false);   // quietly re-check, in case Joe made a new link
 if (REMOTE){
   refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, 60000);

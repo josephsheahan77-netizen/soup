@@ -70,3 +70,23 @@ In a few seconds the soup should fill in with "Read from the board. Check it, th
 
 ## Cost
 Each photo costs roughly 1 to 2 cents. 50 photos a day is about $15 to $30 a month.
+
+# Restaurant links (verified restaurants)
+
+Each restaurant gets a private link from you. Opening it on their phone makes that phone post as the
+restaurant ("Posted by the restaurant", and customers can't overwrite it). Customers just use the app.
+
+## One-time setup
+In Supabase: **SQL Editor → New query**, paste everything in [`restaurant-links.sql`](restaurant-links.sql), click **Run**.
+
+## Make a restaurant's link
+1. Make sure the restaurant is in the app (add it like anyone would).
+2. In Supabase: **SQL Editor → New query**, type this with the restaurant's exact name, and click **Run**:
+   ```sql
+   select make_restaurant_link('pFriem Family Brewers');
+   ```
+3. Copy the link it shows and text it to the restaurant. Ask them to open it on the phone they'll post from
+   and tap **Remind me every morning**.
+4. Lost phone, or staff change? Run the same line again. The old link stops working.
+
+The link is like a key: send it only to the restaurant.

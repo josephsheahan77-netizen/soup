@@ -17,8 +17,8 @@ type the soup (or the band), done. Information only. Nothing to argue about.
 **For restaurants: simple sign-in, no passwords**
 - A small "Own a restaurant?" link (not a new tab).
 - Sign in once with a code sent to your phone or email; stay signed in for weeks.
-- Verified once (a code to the restaurant's public phone number, or a quick call), then your
-  posts show "Posted by the restaurant" for real.
+- [x] Private restaurant links: Joe sends each restaurant its own link; that phone posts as the restaurant (built; see supabase/SETUP.md).
+- [x] "Remind me every morning" adds a daily 9:30 calendar reminder (built).
 - Daily reminder by text or email: reply with the soup and it posts.
 - Customers never need an account.
 - Owner list is private: you (Joe) add a restaurant's email or phone after they say yes. Only you can see it.

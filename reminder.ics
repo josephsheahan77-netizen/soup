@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Local Bowl//Gorge Bowl//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:gorgebowl-daily-soup-reminder@localbowl
+DTSTAMP:20261115T000000Z
+DTSTART:20261116T093000
+DURATION:PT10M
+RRULE:FREQ=DAILY
+SUMMARY:Post today's soup on Gorge Bowl
+DESCRIPTION:What's in the pot today? Open Gorge Bowl and post it: https://josephsheahan77-netizen.github.io/soup/#post
+URL:https://josephsheahan77-netizen.github.io/soup/#post
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Post today's soup on Gorge Bowl
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
