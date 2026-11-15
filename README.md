@@ -29,3 +29,13 @@ Still to do before a second community launches:
   community only sees its own, and let "today" follow each community's time zone
   (the database currently uses Pacific time; Teton Valley is on Mountain time).
 - **One address per community**, e.g. `localbowl.app/gorge`, with its own QR code and home screen name.
+
+## How the soup list is ordered (the rule)
+
+Fair and simple, and the same for everyone:
+1. Restaurants that posted a soup today come first, in a **random order that reshuffles every day**.
+   Nobody picks it: the order comes from the date itself, so it's the same for everyone all day
+   and different tomorrow.
+2. Restaurants with no soup yet come after, **alphabetically**.
+
+No restaurant can pay for a better spot.
