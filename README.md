@@ -43,3 +43,33 @@ Fair and simple, and the same for everyone:
 2. Restaurants with no soup yet come after, **alphabetically**.
 
 No restaurant can pay for a better spot.
+
+## For developers
+
+**What it is:** one static page (`index.html`: HTML, CSS and plain JavaScript, no build step, no framework)
+served by GitHub Pages, with a Supabase (Postgres) database behind it.
+
+**Files**
+| Path | What it is |
+| --- | --- |
+| `index.html` | The whole app. The `COMMUNITY` block at the top of the script holds the town-specific settings and sponsors. |
+| `supabase/setup.sql` | Database tables, the `todays_soups` view, read-only access rules, and the three write functions (`add_restaurant`, `post_soup`, `check_soup`). Safe to re-run. |
+| `supabase/functions/read-soup-board/` | Optional photo reader (Claude vision). Built but switched off; not deployed. |
+| `manifest.webmanifest`, `icons/` | Home screen app setup and icons. |
+| `qr/`, `sponsors/` | QR codes, printable sign, sponsor banner template. |
+| `MISSION.md`, `ROADMAP.md`, `PITCH.md`, `SPONSORS.md` | Why it exists, what's next, the pitch, sponsor specs. |
+
+**How data flows:** the page calls Supabase's REST API with the public publishable key. The public can only
+read; every write goes through a `security definer` function that enforces the rules (length limits, no
+duplicate restaurants, a customer can't overwrite the restaurant's post, a check moves by 1). "Today" is
+Pacific time. Place search uses Photon (OpenStreetMap), with no key needed.
+
+**Run it locally:** `python3 -m http.server 8000` in this folder, then open http://localhost:8000.
+It talks to the live database, so test posts are real (delete them in Supabase's Table Editor).
+To work offline, blank out `DB_URL`/`DB_KEY` and the app saves to the browser only.
+
+**Ship a change:** commit and push to `main`; GitHub Pages updates in a minute or two.
+Database changes: edit `supabase/setup.sql` and run it in Supabase's SQL Editor.
+
+**Ground rules** (see MISSION.md): no ratings, reviews or comments; nobody pays for position; keep it simple.
+Next up is in ROADMAP.md (vandalism guards, restaurant sign-in, multi-town).
