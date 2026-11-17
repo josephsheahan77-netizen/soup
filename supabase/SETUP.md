@@ -90,3 +90,11 @@ In Supabase: **SQL Editor → New query**, paste everything in [`restaurant-link
 4. Lost phone, or staff change? Run the same line again. The old link stops working.
 
 The link is like a key: send it only to the restaurant.
+
+# Multi-day soups
+
+Restaurants posting with their private link can say a soup runs for up to a week ("Same soup for:
+3 days"), so they don't have to post every day. Customers always post for today only.
+
+**One-time setup** (after the restaurant links step): in Supabase, **SQL Editor → New query**, paste everything
+in [`multi-day-soups.sql`](multi-day-soups.sql), click **Run**.

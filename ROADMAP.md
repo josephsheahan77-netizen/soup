@@ -19,6 +19,7 @@ type the soup (or the band), done. Information only. Nothing to argue about.
 - Sign in once with a code sent to your phone or email; stay signed in for weeks.
 - [x] Private restaurant links: Joe sends each restaurant its own link; that phone posts as the restaurant (built; see supabase/SETUP.md).
 - [x] "Remind me every morning" adds a daily 9:30 calendar reminder (built).
+- [x] Multi-day soups: restaurants can post one soup for up to a week (built).
 - Daily reminder by text or email: reply with the soup and it posts.
 - Customers never need an account.
 - Owner list is private: you (Joe) add a restaurant's email or phone after they say yes. Only you can see it.

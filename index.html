@@ -240,6 +240,13 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
             <label for="pSpecial">Other soups &amp; specials (optional)</label>
             <input id="pSpecial" type="text" placeholder="e.g. Split pea, grilled cheese special" maxlength="60" autocomplete="off">
           </div>
+          <div class="field" id="daysField" hidden>
+            <label for="pDays">Same soup for</label>
+            <select id="pDays">
+              <option value="1">Today only</option><option value="2">2 days</option><option value="3">3 days</option>
+              <option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option><option value="7">A week</option>
+            </select>
+          </div>
           <div class="row">
             <button type="submit" class="btn">Post soup</button>
             <span class="toast" id="toast" aria-live="polite"></span>
@@ -307,6 +314,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
           <li><span>Ask Joe for your restaurant's private link.</span></li>
           <li><span>Open it on the phone you'll post from. That phone now posts as your restaurant, and customers can't change your soup.</span></li>
           <li><span>Tap <b>Remind me every morning</b> to get a 9:30 reminder in your phone's calendar.</span></li>
+          <li><span>Same soup for a few days? Pick <b>Same soup for: 3 days</b> (up to a week) and you won't need to post again until it changes.</span></li>
         </ol>
       </div>
 
@@ -407,7 +415,7 @@ async function api(path, body){
   return data;
 }
 const yesterdayKey = () => { const d = new Date(todayKey() + "T12:00:00"); d.setDate(d.getDate() - 1); return d.toLocaleDateString("en-CA"); };
-const toSoup = row => ({id:row.id, soup:row.soup, special:row.special, by:row.posted_by, checks:row.checks, ts:Date.parse(row.created_at)});
+const toSoup = row => ({id:row.id, soup:row.soup, special:row.special, by:row.posted_by, checks:row.checks, ts:Date.parse(row.created_at), until:row.until_day || null});
 
 async function refresh(){
   if (!REMOTE) return;
@@ -433,11 +441,11 @@ const store = {
     let r = restaurants.find(x => x.name.toLowerCase() === p.name.toLowerCase() && (x.town||"") === (p.town||""));
     return r || {id:"r" + Date.now().toString(36), name:p.name, town:p.town || "", address:p.address || "", lat:p.lat, lon:p.lon};
   },
-  async postSoup(rid, soup, special){
+  async postSoup(rid, soup, special, days = 1){
     const by = isOwnerOf(rid) ? "restaurant" : "customer";
     if (REMOTE){
       const body = {p_restaurant_id:rid, p_soup:soup, p_special:special};
-      if (by === "restaurant") body.p_key = owner.key;
+      if (by === "restaurant"){ body.p_key = owner.key; if (days > 1) body.p_days = days; }
       return toSoup(await api("rpc/post_soup", body));
     }
     const old = soups[rid];
@@ -494,6 +502,7 @@ function renderSoups(){
       ${s ? `<h3>${esc(s.soup)}</h3>` : `<h3 class="none">No soup posted yet today</h3>`}
       ${!s && yesterday[r.id] ? `<div class="yest">Yesterday: <b>${esc(yesterday[r.id].soup)}</b>${yesterday[r.id].special ? " · " + esc(yesterday[r.id].special) : ""}</div>` : ""}
       ${s && s.special ? `<div class="special"><b>Also today:</b> ${esc(s.special)}</div>` : ""}
+      ${s && s.until && s.until > todayKey() ? `<div class="special">On through ${new Date(s.until + "T12:00:00").toLocaleDateString(undefined,{weekday:"long"})}</div>` : ""}
       <div class="verify">
         ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
@@ -656,7 +665,7 @@ $("#postForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]");
   btn.disabled = true; $("#toast").textContent = "Posting…";
   try {
-    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null);
+    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null, isOwnerOf(id) ? +$("#pDays").value : 1);
   } catch(err){
     btn.disabled = false;
     $("#toast").textContent = /already posted/.test(err.message) ? "The restaurant already posted today's soup. Tap ✓ on it if it's right." : err.message;
@@ -665,7 +674,7 @@ $("#postForm").addEventListener("submit", async e => {
   btn.disabled = false;
   saveLocal(); renderSoups();
   $("#toast").textContent = "Posted.";
-  $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pickedBox").hidden = true;
+  $("#pSoup").value = ""; $("#pSpecial").value = ""; $("#pDays").value = "1"; $("#pickedBox").hidden = true;
   $("#whereNote").hidden = true;
   setTimeout(() => { $("#toast").textContent = ""; showView("soup"); }, 800);
 });
@@ -808,6 +817,7 @@ if (location.hash === "#post") showView("post");
 /* ---------- restaurant links ---------- */
 function showOwner(){
   $("#ownerBar").hidden = !owner;
+  $("#daysField").hidden = !owner;
   if (owner) $("#ownerName").textContent = owner.name;
 }
 async function checkOwnerKey(key, fromLink){
