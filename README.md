@@ -32,7 +32,7 @@ Still to do before a second community launches:
 - **One database for all communities:** add a `community` column to restaurants so each
   community only sees its own, and let "today" follow each community's time zone
   (the database currently uses Pacific time; Teton Valley is on Mountain time).
-- **One address per community**, e.g. `localbowl.app/gorge`, with its own QR code and home screen name.
+- **One address per community**, e.g. `soupsandtunes.com/gorge`, with its own QR code and home screen name.
 
 ## How the soup list is ordered (the rule)
 

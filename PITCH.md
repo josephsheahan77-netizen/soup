@@ -2,7 +2,7 @@
 
 **Gorge Bowl is a free app that shows what soup every lunch spot in the Gorge has today.**
 No reviews, no ratings, no comments. Just "what's in the pot today, and where."
-Open it at **localbowl.com/gorge**, or scan the QR code.
+Open it at **soupsandtunes.com/gorge**, or scan the QR code.
 
 > Some days you just want a good cup of soup. Some days you just need to dance.
 > Here's the place to find out where.

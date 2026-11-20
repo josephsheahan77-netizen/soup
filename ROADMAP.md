@@ -4,8 +4,8 @@ The test for every idea: **does it keep the app simple and joyful?** Open it, ta
 type the soup (or the band), done. Information only. Nothing to argue about.
 
 ## Now (this week)
-- [ ] Buy **localbowl.com** at Porkbun and point it at the app.
-- [ ] New QR codes and signs with the clean address (localbowl.com/gorge), address printed under the code.
+- [ ] ~~Buy a domain~~ Bought **soupsandtunes.com** at Porkbun. Point it at the app (DNS + GitHub Pages).
+- [ ] New QR codes and signs with the clean address (soupsandtunes.com/gorge), address printed under the code.
 
 ## Next: before handing out QR codes widely
 **Keep it kind (stop vandalism without adding comments)**
@@ -32,7 +32,7 @@ type the soup (or the band), done. Information only. Nothing to argue about.
 - **"I want chicken noodle"**: type a soup and see who has it today. If nobody does, gently show what's close ("No chicken noodle today, but here's what's warm right now: tomato bisque, chicken tortilla..."). Results are never paid for.
 - **Tonight tab**: music, theater, markets. Anyone posts; the venue's post wins; events disappear after they happen.
 - **Seasonal joy**: small seasonal touches beyond color, such as a local wildflower or snowflake drawing that fits each region.
-- **More towns**: a community column in the database, one address per town (localbowl.com/teton), each town sees only its own.
+- **More towns**: a community column in the database, one address per town (soupsandtunes.com/teton), each town sees only its own.
 - **Sponsors**: turn on the bottom banner when the first business says yes (see SPONSORS.md).
 
 ## Not doing, ever
