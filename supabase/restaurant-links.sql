@@ -11,6 +11,13 @@
 
 begin;
 
+-- Already set up multi-day soups? Then this file has done its job: stop without changing anything.
+do $$ begin
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'soups' and column_name = 'until_day') then
+    raise exception 'Restaurant links are already set up (multi-day soups is installed too). Nothing to do.';
+  end if;
+end $$;
+
 -- Only a fingerprint (hash) of each link is stored, never the link itself.
 create table if not exists public.restaurant_keys (
   restaurant_id uuid primary key references public.restaurants(id) on delete cascade,
@@ -27,7 +34,7 @@ $$;
 
 -- Make (or remake) a restaurant's private link. Only runnable from the SQL Editor.
 create or replace function public.make_restaurant_link(
-  p_name text, p_site text default 'https://josephsheahan77-netizen.github.io/soup/')
+  p_name text, p_site text default 'https://soupsandtunes.com/gorge/')
 returns text
 language plpgsql security definer set search_path = public as $$
 declare r public.restaurants; n integer; k text;

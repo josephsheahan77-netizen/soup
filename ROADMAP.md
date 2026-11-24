@@ -4,8 +4,8 @@ The test for every idea: **does it keep the app simple and joyful?** Open it, ta
 type the soup (or the band), done. Information only. Nothing to argue about.
 
 ## Now (this week)
-- [ ] ~~Buy a domain~~ Bought **soupsandtunes.com** at Porkbun. Point it at the app (DNS + GitHub Pages).
-- [ ] New QR codes and signs with the clean address (soupsandtunes.com/gorge), address printed under the code.
+- [x] Bought **soupsandtunes.com** and pointed it at the app. Live at soupsandtunes.com/gorge.
+- [x] New QR codes and sign with soupsandtunes.com/gorge printed under the code (`qr/`).
 
 ## Next: before handing out QR codes widely
 **Keep it kind (stop vandalism without adding comments)**

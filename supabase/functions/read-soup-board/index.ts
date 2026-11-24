@@ -11,6 +11,8 @@ import { z } from "npm:zod@4.6.7";
 
 // Only the Gorge Bowl site (and local testing) may use this function.
 const ALLOWED_ORIGINS = [
+  "https://soupsandtunes.com",
+  "https://www.soupsandtunes.com",
   "https://josephsheahan77-netizen.github.io",
   "http://localhost:8000",
 ];

@@ -98,3 +98,11 @@ Restaurants posting with their private link can say a soup runs for up to a week
 
 **One-time setup** (after the restaurant links step): in Supabase, **SQL Editor → New query**, paste everything
 in [`multi-day-soups.sql`](multi-day-soups.sql), click **Run**.
+
+# New address: soupsandtunes.com
+
+So new restaurant links use **soupsandtunes.com/gorge**: in Supabase, **SQL Editor → New query**, paste
+everything in [`new-address.sql`](new-address.sql), click **Run**. Links already sent keep working.
+
+**Setup order for a fresh project:** `setup.sql` → `restaurant-links.sql` → `multi-day-soups.sql` → `new-address.sql`.
+Each runs once; running `restaurant-links.sql` again later stops safely without changing anything.
