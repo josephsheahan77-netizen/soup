@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily soup reminder · Gorge Bowl</title>
+<meta name="theme-color" content="#1f3a2b">
+<link rel="icon" type="image/svg+xml" href="../icons/icon.svg">
+<style>
+:root{--ink:#141414;--soft:#4a4a44;--band:#1f3a2b;--band-ink:#f7ecd6;--ground:#f6e6cb;--card:#fffaf1;--line:#e2c9a0;--a1:#c4561f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--band);color:var(--band-ink);padding:22px max(16px,env(safe-area-inset-left,0px)) 20px max(16px,env(safe-area-inset-right,0px));padding-top:calc(22px + env(safe-area-inset-top,0px));display:flex;gap:12px;align-items:center}
+header img{width:48px;height:auto}
+header h1{margin:0;font-size:24px;line-height:1.15}
+header p{margin:4px 0 0;opacity:.85;font-size:15px}
+main{max-width:520px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
+p{margin:0}
+.btn{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:18px;border-radius:12px;padding:16px;border:2px solid var(--ink);color:var(--ink);background:var(--card)}
+.btn.main{background:var(--a1);border-color:var(--a1);color:#fff}
+.btn:focus-visible{outline:3px solid var(--a1);outline-offset:3px}
+small{color:var(--soft);font-size:14px}
+a.plain{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <img src="../icons/mark.svg" alt="" width="48" height="48">
+  <div><h1>Daily soup reminder</h1><p>A nudge at 9:30 each morning to post your soup on Gorge Bowl.</p></div>
+</header>
+<main>
+  <p>Tap the button for your phone, then tap <b>Add</b> or <b>Save</b>.</p>
+  <a class="btn" id="ios" href="../reminder.ics">iPhone: add to my calendar</a>
+  <a class="btn" id="android" href="#">Android: add to Google Calendar</a>
+  <small>Want a different time? Change it in your calendar after adding. Want it to stop? Delete the "Post today's soup" event.</small>
+  <small>Rather not use the calendar? Set a daily 9:30 alarm in your Clock app instead.</small>
+  <p><a class="plain" href="../gorge/">Open Gorge Bowl</a></p>
+</main>
+<script>
+/* Google Calendar "add event" link: daily at 9:30 Pacific, starting tomorrow. */
+const t = new Date(Date.now() + 864e5);
+const d = t.toLocaleDateString("en-CA", {timeZone: "America/Los_Angeles"}).replace(/-/g, "");
+const g = new URL("https://calendar.google.com/calendar/render");
+g.search = new URLSearchParams({
+  action: "TEMPLATE",
+  text: "Post today's soup on Gorge Bowl",
+  details: "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post",
+  dates: d + "T093000/" + d + "T094000",
+  ctz: "America/Los_Angeles",
+  recur: "RRULE:FREQ=DAILY"
+}).toString();
+document.getElementById("android").href = g.toString();
+/* Put the right button first and make it stand out. */
+const isAndroid = /android/i.test(navigator.userAgent);
+const mine = document.getElementById(isAndroid ? "android" : "ios");
+mine.classList.add("main");
+mine.parentNode.insertBefore(mine, mine.parentNode.children[1]);
+</script>
+</body>
+</html>
