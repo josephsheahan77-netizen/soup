@@ -112,3 +112,25 @@ Each runs once; running `restaurant-links.sql` again later stops safely without 
 Lets anyone pick "Same soup for: 2–5 days" when posting, so the soup doesn't reset tonight.
 In Supabase: **SQL Editor → New query**, paste everything in [`multi-day-for-everyone.sql`](multi-day-for-everyone.sql), click **Run**.
 Until it's run, multi-day picks quietly post for today only.
+
+# Keep it kind (blocked words)
+
+Rejects crude words and complaints ("sucks", "worst", "gross"…) in soups, specials and restaurant names.
+In Supabase: **SQL Editor → New query**, paste everything in [`keep-it-kind.sql`](keep-it-kind.sql), click **Run**.
+To block another word later, add it to the list in that file and run it again.
+
+# Quick fixes (SQL Editor one-liners)
+
+Remove today's soup posts for a restaurant (e.g. something rude got through):
+```sql
+delete from soups where restaurant_id = (select id from restaurants where name ilike '%calzone%')
+  and (now() at time zone 'America/Los_Angeles')::date between day and until_day;
+```
+
+Rename a restaurant:
+```sql
+update restaurants set name = 'Trillium Tavern' where name ilike '%trillium%';
+```
+
+Remove a restaurant (and its soups): find its id with
+`select id, name, town from restaurants order by name;` then `delete from restaurants where id = '...';`

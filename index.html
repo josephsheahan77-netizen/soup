@@ -37,6 +37,7 @@ header .wrap{padding-block:22px 0;display:grid;gap:14px}
 .brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,7vw,44px);line-height:1;margin:0;letter-spacing:-.02em}
 .brand p{margin:6px 0 0;opacity:.85;font-size:15px}
+.brand p.family{margin-top:2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.65}
 .title{display:flex;align-items:center;gap:12px}
 .mark{width:clamp(44px,11vw,60px);height:auto;flex:none}
 html{-webkit-text-size-adjust:100%}
@@ -72,6 +73,9 @@ main .wrap{padding-block:22px 48px;display:grid;gap:22px}
 .special{font-size:14px;color:var(--ink-soft);margin-top:4px}
 .special b{font-weight:600;color:var(--ink)}
 .yest{font-size:14px;color:var(--ink-soft);margin-top:2px}
+.waiting{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.8}
+.waiting b{color:var(--ink)}
+.waiting .link{color:var(--ink);padding:0;font-size:14px}
 .yest b{font-weight:600}
 .verify{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}
 .who{font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--line);color:var(--ink-soft)}
@@ -165,6 +169,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
         <div>
           <h1 data-c="name">Gorge Bowl</h1>
           <p data-c="tagline">Soups around the Gorge</p>
+          <p class="family">part of Soups &amp; Tunes</p>
         </div>
       </div>
     </div>
@@ -361,7 +366,10 @@ const REMOTE = !!(DB_URL && DB_KEY);
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const todayKey = () => new Date().toLocaleDateString("en-CA", {timeZone: COMMUNITY.timeZone});
-const mapsUrl = r => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([r.name, r.address || r.town].filter(Boolean).join(", "));
+const mapsUrl = r => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(
+  /\d/.test(r.address || "") ? [r.name, r.address].join(", ")
+  : (typeof r.lat === "number" && typeof r.lon === "number") ? `${r.lat},${r.lon}`
+  : [r.name, r.town || COMMUNITY.area.replace(/^around /, "")].filter(Boolean).join(", "));
 
 /* ---------- device storage ---------- */
 function load(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch(e){ return d; } }
@@ -483,7 +491,10 @@ function renderSoups(){
     .filter(r => townFilter==="all" || r.town===townFilter)
     .map(r => ({r, s: soups[r.id]}))
     .sort((a,b) => (!!b.s - !!a.s) || (a.s ? rank(a.r.id) - rank(b.r.id) : a.r.name.localeCompare(b.r.name)));
-  $("#soupList").innerHTML = list.map(({r,s}) => {
+  const showCard = ({r,s}) => s || yesterday[r.id] || editing === r.id;
+  const quiet = list.filter(x => !showCard(x));
+  const cards = list.filter(showCard);
+  $("#soupList").innerHTML = cards.map(({r,s}) => {
     const mine = s && checked[s.id];
     return `
     <article class="soup">
@@ -499,7 +510,10 @@ function renderSoups(){
         : `${yesterday[r.id] ? `<button type="button" class="check" data-act="same" data-id="${r.id}">✓ Same soup today</button>` : ""}<button type="button" class="link" data-act="fix" data-id="${r.id}">${yesterday[r.id] ? "Different soup?" : "Post the soup"}</button>`}
       </div>
       ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
-    </article>`; }).join("") || `<p>No restaurants in that town yet.</p>`;
+    </article>`; }).join("")
+    + (!cards.length && list.length ? `<p class="waiting">No soups posted yet today. Seeing a soup board? Post it above.</p>` : "")
+    + (quiet.length ? `<p class="waiting"><b>No soup posted yet:</b> ${quiet.map(({r}) => `<button type="button" class="link" data-act="quick" data-id="${r.id}">${esc(r.name)}</button>`).join(" · ")}</p>` : "")
+    || `<p>No restaurants in that town yet.</p>`;
   if (editing){ const f = $("#fixIn"); f && f.focus(); }
 }
 
@@ -526,6 +540,7 @@ $("#soupList").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
   const act = b.dataset.act;
   if (act === "add") return startAdd();
+  if (act === "quick"){ $("#qRest").value = b.dataset.id; window.scrollTo({top: 0, behavior: "smooth"}); $("#qSoup").focus(); return; }
   if (act === "retry"){ loadError = ""; renderSoups(); return refresh(); }
   const id = b.dataset.id, s = soups[id];
   if (act === "fix"){ editing = editing === id ? null : id; return renderSoups(); }
@@ -789,7 +804,7 @@ applySeason();
 /* Fill in the community's name and details. */
 document.querySelectorAll('[data-c="name"]').forEach(el => el.textContent = COMMUNITY.name);
 document.querySelectorAll('[data-c="tagline"]').forEach(el => el.textContent = COMMUNITY.tagline);
-document.title = COMMUNITY.name;
+document.title = COMMUNITY.name + " · Soups & Tunes";
 document.querySelector('meta[name="description"]').setAttribute("content", COMMUNITY.description);
 document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", COMMUNITY.name);
 $("#placeHint").textContent = SEARCH_HINT;
