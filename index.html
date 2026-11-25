@@ -310,12 +310,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 
       <div class="guide">
         <h2>For restaurants</h2>
-        <ol class="steps">
-          <li><span>Ask Joe for your restaurant's private link.</span></li>
-          <li><span>Open it on the phone you'll post from. That phone now posts as your restaurant, and customers can't change your soup.</span></li>
-          <li><span>Tap <b>Remind me every morning</b> to get a 9:30 reminder in your phone's calendar.</span></li>
-          <li><span>Same soup for a few days? Pick <b>Same soup for: 3 days</b> (up to a week) and you won't need to post again until it changes.</span></li>
-        </ol>
+        <p>Post your soup just like anyone else: tap <b>Post a soup</b>, type it, done. Want a nudge? Ask Joe for a quick reminder text each morning.</p>
       </div>
 
       <div class="guide">
@@ -330,7 +325,6 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
       <div class="guide">
         <h2>The house rules</h2>
         <ul class="facts">
-          <li>A soup posted by the restaurant always wins over a customer's post.</li>
           <li>No comments, no reviews, no ratings. Just soup.</li>
           <li>Soups clear every night. The colors follow the seasons.</li>
         </ul>
@@ -504,7 +498,7 @@ function renderSoups(){
       ${s && s.special ? `<div class="special"><b>Also today:</b> ${esc(s.special)}</div>` : ""}
       ${s && s.until && s.until > todayKey() ? `<div class="special">On through ${new Date(s.until + "T12:00:00").toLocaleDateString(undefined,{weekday:"long"})}</div>` : ""}
       <div class="verify">
-        ${s ? `<span class="who ${s.by}">${s.by==="restaurant" ? "Posted by the restaurant" : "Posted by a customer"}</span>
+        ${s ? `${s.by==="restaurant" ? `<span class="who restaurant">Posted by the restaurant</span>` : ""}
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
         ${isOwnerOf(r.id) ? `<button type="button" class="link" data-act="fix" data-id="${r.id}">Update our soup</button>` : s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
         : `${yesterday[r.id] ? `<button type="button" class="check" data-act="same" data-id="${r.id}">✓ Same soup today</button>` : ""}<button type="button" class="link" data-act="fix" data-id="${r.id}">${yesterday[r.id] ? "Different soup?" : "Post the soup"}</button>`}
