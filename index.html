@@ -73,6 +73,8 @@ main .wrap{padding-block:22px 48px;display:grid;gap:22px}
 .special{font-size:14px;color:var(--ink-soft);margin-top:4px}
 .special b{font-weight:600;color:var(--ink)}
 .yest{font-size:14px;color:var(--ink-soft);margin-top:2px}
+.hist{list-style:none;margin:8px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;gap:2px;font-size:14px;color:var(--ink-soft)}
+.hist span{display:inline-block;width:3em;font-weight:600;color:var(--ink)}
 .waiting{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.8}
 .waiting b{color:var(--ink)}
 .waiting .link{color:var(--ink);padding:0;font-size:14px}
@@ -380,6 +382,8 @@ let restaurants = [];                   // {id,name,town,address,lat,lon}
 let soups = {};                         // restaurant id -> {id,soup,special,by,checks,ts}
 let checked = load("gb.checked", {});   // soup ids this device has checked
 let yesterday = {};                     // restaurant id -> yesterday's last soup
+let history = {};                       // restaurant id -> {date: soup} for the past week (not today)
+const openHist = {};                    // which cards have "Past week" open
 let loaded = !REMOTE, loadError = "";
 
 if (!REMOTE){
@@ -404,6 +408,8 @@ async function api(path, body){
   if (!res.ok) throw new Error((data && (data.message || data.hint)) || "Couldn't reach the soup database.");
   return data;
 }
+const nextDay = k => { const d = new Date(k + "T12:00:00"); d.setDate(d.getDate() + 1); return d.toLocaleDateString("en-CA"); };
+const daysAgoKey = n => { const d = new Date(todayKey() + "T12:00:00"); d.setDate(d.getDate() - n); return d.toLocaleDateString("en-CA"); };
 const yesterdayKey = () => { const d = new Date(todayKey() + "T12:00:00"); d.setDate(d.getDate() - 1); return d.toLocaleDateString("en-CA"); };
 const toSoup = row => ({id:row.id, soup:row.soup, special:row.special, by:row.posted_by, checks:row.checks, ts:Date.parse(row.created_at), until:row.until_day || null});
 
@@ -413,13 +419,20 @@ async function refresh(){
     const [rs, ss, ys] = await Promise.all([
       api("restaurants?select=id,name,town,address,lat,lon&order=name"),
       api("todays_soups?select=*"),
-      api("soups?select=restaurant_id,soup,special,created_at&day=eq." + yesterdayKey() + "&order=created_at.desc").catch(() => [])
+      api("soups?select=restaurant_id,soup,special,created_at,day,until_day&day=gte." + daysAgoKey(7) + "&order=created_at.asc").catch(() => [])
     ]);
     if (!Array.isArray(rs) || !Array.isArray(ss)) throw new Error("The soup database sent back something unexpected.");
     restaurants = rs;
     soups = Object.fromEntries(ss.map(r => [r.restaurant_id, toSoup(r)]));
+    /* Past week, one soup per day per restaurant (multi-day posts fill each day they ran; newest post wins). */
+    history = {};
+    const first = daysAgoKey(7), last = yesterdayKey();
+    (Array.isArray(ys) ? ys : []).forEach(row => {
+      const h = history[row.restaurant_id] = history[row.restaurant_id] || {};
+      for (let d = row.day < first ? first : row.day; d <= (row.until_day || row.day) && d <= last; d = nextDay(d)) h[d] = row;
+    });
     yesterday = {};
-    (Array.isArray(ys) ? ys : []).forEach(r => { if (!yesterday[r.restaurant_id]) yesterday[r.restaurant_id] = r; });
+    for (const rid in history) if (history[rid][last]) yesterday[rid] = history[rid][last];
     loaded = true; loadError = "";
   } catch(e){ loadError = e.message; }
   renderSoups(); renderPicker(currentPick());
@@ -509,8 +522,11 @@ function renderSoups(){
         <button type="button" class="check" data-act="check" data-id="${r.id}" aria-pressed="${!!mine}">✓ ${mine ? "You checked" : "That's right"}${s.checks ? " · " + s.checks : ""}</button>
         ${isOwnerOf(r.id) ? `<button type="button" class="link" data-act="fix" data-id="${r.id}">Update our soup</button>` : s.by==="restaurant" ? "" : `<button type="button" class="link" data-act="fix" data-id="${r.id}">Different soup?</button>`}`
         : `${yesterday[r.id] ? `<button type="button" class="check" data-act="same" data-id="${r.id}">✓ Same soup today</button>` : ""}<button type="button" class="link" data-act="fix" data-id="${r.id}">${yesterday[r.id] ? "Different soup?" : "Post the soup"}</button>`}
+        ${history[r.id] && Object.keys(history[r.id]).length ? `<button type="button" class="link" data-act="hist" data-id="${r.id}" aria-expanded="${!!openHist[r.id]}">${openHist[r.id] ? "Hide past week" : "Past week"}</button>` : ""}
       </div>
       ${editing===r.id ? `<form class="fix" data-id="${r.id}"><label for="fixIn" class="vh">Soup name</label><input id="fixIn" type="text" placeholder="Soup name only" maxlength="40" autocomplete="off"><button type="submit" class="btn">Update</button></form>` : ""}
+      ${openHist[r.id] && history[r.id] ? `<ul class="hist">${Object.keys(history[r.id]).sort().reverse().map(d =>
+          `<li><span>${new Date(d + "T12:00:00").toLocaleDateString(undefined,{weekday:"short"})}</span> ${esc(history[r.id][d].soup)}</li>`).join("")}</ul>` : ""}
     </article>`; }).join("")
     + (!cards.length && list.length ? `<p class="waiting">No soups posted yet today. Seeing a soup board? Post it above.</p>` : "")
     + (quiet.length ? `<p class="waiting"><b>No soup posted yet:</b> ${quiet.map(({r}) => `<button type="button" class="link" data-act="quick" data-id="${r.id}">${esc(r.name)}</button>`).join(" · ")}</p>` : "")
@@ -541,6 +557,7 @@ $("#soupList").addEventListener("click", async e => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
   const act = b.dataset.act;
   if (act === "add") return startAdd();
+  if (act === "hist"){ openHist[b.dataset.id] = !openHist[b.dataset.id]; return renderSoups(); }
   if (act === "quick"){ $("#qRest").value = b.dataset.id; window.scrollTo({top: 0, behavior: "smooth"}); $("#qSoup").focus(); return; }
   if (act === "retry"){ loadError = ""; renderSoups(); return refresh(); }
   const id = b.dataset.id, s = soups[id];
