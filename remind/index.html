@@ -35,7 +35,7 @@ a.plain{color:var(--ink);font-weight:600}
   <small id="other"></small>
   <small>Want a different time? Change it in your calendar after adding. Want it to stop? Delete the event from your calendar.</small>
   <small>Rather not use the calendar? Set a daily 9:30 alarm in your Clock app instead.</small>
-  <p><a class="plain" href="../gorge/">Open Gorge Bowl</a></p>
+  <p><a class="plain" href="../gorge/">Back to soups</a></p>
 </main>
 <script>
 /* Two kinds: ?lunch = a lunchtime nudge to check the soups; otherwise a 9:30 nudge for restaurants to post. */
@@ -43,7 +43,7 @@ const lunch = new URLSearchParams(location.search).has("lunch");
 const R = lunch
   ? {ics: "../reminder-lunch.ics", text: "What's the soup today?", details: "See today's soups around the Gorge: https://soupsandtunes.com/gorge/", start: "T111500", end: "T112500",
      title: "Daily lunch reminder", sub: "A nudge at 11:15 each day to see what soups are on around the Gorge.",
-     other: '<a class="plain" href="./">Work at a restaurant? Get a 9:30 reminder to post instead.</a>'}
+     other: '<a class="plain" href="./">Are you posting for a restaurant? Get a 9:30 reminder to post instead.</a>'}
   : {ics: "../reminder.ics", text: "Post today's soup on Gorge Bowl", details: "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post", start: "T093000", end: "T094000",
      title: "Daily soup reminder", sub: "A nudge at 9:30 each morning to post your soup on Gorge Bowl.",
      other: '<a class="plain" href="?lunch">Just here for lunch? Get an 11:15 reminder to check the soups.</a>'};
