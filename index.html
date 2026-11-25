@@ -318,7 +318,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
         <h2>The house rules</h2>
         <ul class="facts">
           <li>No comments, no reviews, no ratings. Just soup.</li>
-          <li>We count visits anonymously, so we know how many people check the soups. No names, no ads tracking you.</li>
+          <li>We count visits anonymously, so we know how many people check the soups. No names, no ad tracking, and "Use my location" never leaves your phone.</li>
           <li>Soups clear every night. The colors follow the seasons.</li>
         </ul>
       </div>
@@ -717,25 +717,9 @@ function findWhereIAm(){
       $("#whereNote").textContent = `Looks like you're at ${near.r.name}. Change it below if not.`;
       return;
     }
-    /* Not a saved restaurant yet: offer the places right here. */
-    try {
-      const res = await fetch(`https://photon.komoot.io/reverse?lat=${here.lat}&lon=${here.lon}&radius=0.15&limit=8&lang=en`);
-      const data = await res.json();
-      const found = (data.features || []).filter(f => f.properties && f.properties.name && f.properties.osm_key === "amenity").map(f => {
-        const p = f.properties, town = p.city || p.town || p.village || p.district || p.county || "";
-        const street = [p.housenumber, p.street].filter(Boolean).join(" ");
-        return { name:p.name, town, address:[street, town].filter(Boolean).join(", "),
-                 lat:f.geometry.coordinates[1], lon:f.geometry.coordinates[0], kind:(p.osm_value || "").replace(/_/g," ") };
-      });
-      if (!found.length) throw new Error("none");
-      renderPicker("__new"); $("#pickedBox").hidden = true; $("#manualBox").hidden = true;
-      places = found; $("#placeQ").value = "";
-      $("#placeHint").textContent = "Places right where you are. Tap the right one.";
-      $("#placeResults").innerHTML = found.map((p,i) => `<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><small>${esc([p.kind, p.address || p.town].filter(Boolean).join(" · "))}</small></button></li>`).join("");
-      $("#whereNote").textContent = `This spot isn't in ${COMMUNITY.name} yet. Pick it below to add it.`;
-    } catch(e){
-      $("#whereNote").textContent = "Couldn't tell which restaurant you're at. Pick it below.";
-    }
+    /* Nothing saved right here. The location stays on this phone: it's never sent anywhere. */
+    renderPicker(); $("#pickedBox").hidden = true;
+    $("#whereNote").textContent = "This spot isn't in Gorge Bowl yet. Pick it below, or choose + Add a restaurant.";
   }, () => {
     $("#whereNote").textContent = "Location is off for this site. Pick the restaurant below.";
   }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
