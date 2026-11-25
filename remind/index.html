@@ -20,6 +20,12 @@ p{margin:0}
 .btn.main{background:var(--a1);border-color:var(--a1);color:#fff}
 .btn:focus-visible{outline:3px solid var(--a1);outline-offset:3px}
 small{color:var(--soft);font-size:14px}
+[hidden]{display:none!important}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
+.card h2{margin:0;font-size:20px;line-height:1.25}
+.btns{display:grid;gap:10px}
+#timeBox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:600}
+select{font:inherit;font-size:17px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
 a.plain{color:var(--ink);font-weight:600}
 </style>
 </head>
@@ -29,46 +35,72 @@ a.plain{color:var(--ink);font-weight:600}
   <div><h1 id="title">Daily soup reminder</h1><p id="sub">A nudge at 9:30 each morning to post your soup on Gorge Bowl.</p></div>
 </header>
 <main>
-  <p>Tap the button for your phone, then tap <b>Add</b> or <b>Save</b>.</p>
-  <a class="btn" id="ios" href="../reminder.ics">iPhone: add to my calendar</a>
-  <a class="btn" id="android" href="#">Android: add to Google Calendar</a>
+  <section class="card">
+    <h2 id="h1">Are you a restaurant? Set yourself a daily reminder</h2>
+    <div id="timeBox">
+      <label for="time">Remind me at</label>
+      <select id="time">
+        <option value="0800">8:00 am</option><option value="0830">8:30 am</option><option value="0900">9:00 am</option>
+        <option value="0930" selected>9:30 am</option><option value="1000">10:00 am</option><option value="1030">10:30 am</option>
+        <option value="1100">11:00 am</option>
+      </select>
+    </div>
+    <p>Tap the button for your phone, then tap <b>Add</b> or <b>Save</b>.</p>
+    <div class="btns" id="btns">
+      <a class="btn" id="ios" href="reminder-0930.ics">iPhone: add to my calendar</a>
+      <a class="btn" id="android" href="#">Android: add to Google Calendar</a>
+    </div>
+    <small>To stop it later, delete the event from your calendar. Rather not use the calendar? Set a daily alarm in your Clock app instead.</small>
+  </section>
+
+  <section class="card" id="multi">
+    <h2>Same soup for a few days?</h2>
+    <p>When you post, pick <b>Same soup for: 2, 3, 4 or 5 days</b>. It stays up and won't reset tonight, so you don't have to post again until it changes.</p>
+    <a class="btn" href="../gorge/#post">Post a soup for several days</a>
+  </section>
+
   <small id="other"></small>
-  <small>Want a different time? Change it in your calendar after adding. Want it to stop? Delete the event from your calendar.</small>
-  <small>Rather not use the calendar? Set a daily 9:30 alarm in your Clock app instead.</small>
   <p><a class="plain" href="../gorge/">Back to soups</a></p>
 </main>
 <script>
-/* Two kinds: ?lunch = a lunchtime nudge to check the soups; otherwise a 9:30 nudge for restaurants to post. */
+/* Two kinds: ?lunch = a lunchtime nudge to check the soups; otherwise a nudge for restaurants to post. */
 const lunch = new URLSearchParams(location.search).has("lunch");
-const R = lunch
-  ? {ics: "../reminder-lunch.ics", text: "What's the soup today?", details: "See today's soups around the Gorge: https://soupsandtunes.com/gorge/", start: "T111500", end: "T112500",
-     title: "Daily lunch reminder", sub: "A nudge at 11:15 each day to see what soups are on around the Gorge.",
-     other: '<a class="plain" href="./">Are you posting for a restaurant? Get a 9:30 reminder to post instead.</a>'}
-  : {ics: "../reminder.ics", text: "Post today's soup on Gorge Bowl", details: "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post", start: "T093000", end: "T094000",
-     title: "Daily soup reminder", sub: "A nudge at 9:30 each morning to post your soup on Gorge Bowl.",
-     other: '<a class="plain" href="?lunch">Just here for lunch? Get an 11:15 reminder to check the soups.</a>'};
-document.getElementById("title").textContent = R.title;
-document.getElementById("sub").textContent = R.sub;
-document.getElementById("other").innerHTML = R.other;
-document.getElementById("ios").href = R.ics;
-document.title = R.title + " · Gorge Bowl";
-const t = new Date(Date.now() + 864e5);
-const d = t.toLocaleDateString("en-CA", {timeZone: "America/Los_Angeles"}).replace(/-/g, "");
-const g = new URL("https://calendar.google.com/calendar/render");
-g.search = new URLSearchParams({
-  action: "TEMPLATE",
-  text: R.text,
-  details: R.details,
-  dates: d + R.start + "/" + d + R.end,
-  ctz: "America/Los_Angeles",
-  recur: "RRULE:FREQ=DAILY"
-}).toString();
-document.getElementById("android").href = g.toString();
+const $ = id => document.getElementById(id);
+const tomorrow = new Date(Date.now() + 864e5).toLocaleDateString("en-CA", {timeZone: "America/Los_Angeles"}).replace(/-/g, "");
+function googleLink(text, details, hhmm){
+  const end = String(+hhmm + 10).padStart(4, "0");   // 10 minutes long
+  const g = new URL("https://calendar.google.com/calendar/render");
+  g.search = new URLSearchParams({action: "TEMPLATE", text, details,
+    dates: `${tomorrow}T${hhmm}00/${tomorrow}T${end}00`, ctz: "America/Los_Angeles", recur: "RRULE:FREQ=DAILY"}).toString();
+  return g.toString();
+}
+function update(){
+  if (lunch){
+    $("ios").href = "../reminder-lunch.ics";
+    $("android").href = googleLink("What's the soup today?", "See today's soups around the Gorge: https://soupsandtunes.com/gorge/", "1115");
+  } else {
+    const t = $("time").value;
+    $("ios").href = "reminder-" + t + ".ics";
+    $("android").href = googleLink("Post today's soup on Gorge Bowl", "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post", t);
+  }
+}
+if (lunch){
+  $("title").textContent = "Daily lunch reminder";
+  $("sub").textContent = "A nudge at 11:15 each day to see what soups are on around the Gorge.";
+  $("h1").textContent = "Get a daily lunchtime reminder";
+  $("timeBox").hidden = true; $("multi").hidden = true;
+  $("other").innerHTML = '<a class="plain" href="./">Are you posting for a restaurant? Set a reminder to post instead.</a>';
+} else {
+  $("title").textContent = "Daily soup reminder";
+  $("sub").textContent = "A daily nudge to post your soup on Gorge Bowl.";
+  $("other").innerHTML = '<a class="plain" href="?lunch">Just here for lunch? Get an 11:15 reminder to check the soups.</a>';
+}
+document.title = $("title").textContent + " · Gorge Bowl";
+$("time").addEventListener("change", update);
+update();
 /* Put the right button first and make it stand out. */
-const isAndroid = /android/i.test(navigator.userAgent);
-const mine = document.getElementById(isAndroid ? "android" : "ios");
-mine.classList.add("main");
-mine.parentNode.insertBefore(mine, mine.parentNode.children[1]);
+const mine = $(/android/i.test(navigator.userAgent) ? "android" : "ios");
+mine.classList.add("main"); $("btns").prepend(mine);
 </script>
 </body>
 </html>

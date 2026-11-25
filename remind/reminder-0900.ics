@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Local Bowl//Gorge Bowl//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:gorgebowl-daily-soup-reminder-0900@soupsandtunes
+DTSTAMP:20261126T000000Z
+DTSTART:20261127T090000
+DURATION:PT10M
+RRULE:FREQ=DAILY
+SUMMARY:Post today's soup on Gorge Bowl
+DESCRIPTION:What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post
+URL:https://soupsandtunes.com/gorge/#post
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Post today's soup on Gorge Bowl
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

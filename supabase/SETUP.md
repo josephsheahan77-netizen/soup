@@ -106,3 +106,9 @@ everything in [`new-address.sql`](new-address.sql), click **Run**. Links already
 
 **Setup order for a fresh project:** `setup.sql` → `restaurant-links.sql` → `multi-day-soups.sql` → `new-address.sql`.
 Each runs once; running `restaurant-links.sql` again later stops safely without changing anything.
+
+# Multi-day soups for everyone
+
+Lets anyone pick "Same soup for: 2–5 days" when posting, so the soup doesn't reset tonight.
+In Supabase: **SQL Editor → New query**, paste everything in [`multi-day-for-everyone.sql`](multi-day-for-everyone.sql), click **Run**.
+Until it's run, multi-day picks quietly post for today only.

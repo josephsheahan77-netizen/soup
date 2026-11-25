@@ -245,11 +245,11 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
             <label for="pSpecial">Other soups &amp; specials (optional)</label>
             <input id="pSpecial" type="text" placeholder="e.g. Split pea, grilled cheese special" maxlength="60" autocomplete="off">
           </div>
-          <div class="field" id="daysField" hidden>
+          <div class="field" id="daysField">
             <label for="pDays">Same soup for</label>
             <select id="pDays">
-              <option value="1">Today only</option><option value="2">2 days</option><option value="3">3 days</option>
-              <option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option><option value="7">A week</option>
+              <option value="1">Today only (resets tonight)</option><option value="2">2 days</option><option value="3">3 days</option>
+              <option value="4">4 days</option><option value="5">5 days</option>
             </select>
           </div>
           <div class="row">
@@ -426,7 +426,8 @@ const store = {
     const by = isOwnerOf(rid) ? "restaurant" : "customer";
     if (REMOTE){
       const body = {p_restaurant_id:rid, p_soup:soup, p_special:special};
-      if (by === "restaurant"){ body.p_key = owner.key; if (days > 1) body.p_days = days; }
+      if (by === "restaurant") body.p_key = owner.key;
+      if (days > 1) body.p_days = days;
       return toSoup(await api("rpc/post_soup", body));
     }
     const old = soups[rid];
@@ -668,7 +669,7 @@ $("#postForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]");
   btn.disabled = true; $("#toast").textContent = "Posting…";
   try {
-    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null, isOwnerOf(id) ? +$("#pDays").value : 1);
+    soups[id] = await store.postSoup(id, soup, $("#pSpecial").value.trim() || null, +$("#pDays").value);
   } catch(err){
     btn.disabled = false;
     $("#toast").textContent = /already posted/.test(err.message) ? "The restaurant already posted today's soup. Tap ✓ on it if it's right." : err.message;
@@ -810,7 +811,6 @@ if (location.hash === "#post") showView("post");
 /* ---------- restaurant links ---------- */
 function showOwner(){
   $("#ownerBar").hidden = !owner;
-  $("#daysField").hidden = !owner;
   if (owner) $("#ownerName").textContent = owner.name;
 }
 async function checkOwnerKey(key, fromLink){
