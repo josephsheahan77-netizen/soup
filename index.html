@@ -128,17 +128,12 @@ ul.facts{margin:0;padding-left:20px;display:grid;gap:6px;max-width:60ch}
 .toast{font-size:14px}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 
-.remind{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,280px);gap:20px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.remind h2{margin:0 0 6px;font-family:var(--font-display);font-size:21px}
-.remind p{margin:0 0 14px;color:var(--ink-soft);font-size:14px;max-width:52ch}
-.rfields{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;max-width:300px}
-.rfields label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-.phone{background:var(--ground);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px}
-.phead{font-size:12px;color:var(--ink-soft);text-align:center}
-.bubble{font-size:14px;padding:8px 12px;border-radius:14px;max-width:88%;line-height:1.4}
-.bubble.in{background:var(--card);border:1px solid var(--line);justify-self:start}
-.bubble.out{background:var(--band);color:var(--band-ink);justify-self:end}
 
+.quick{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;transition:background-color .8s ease,border-color .8s ease}
+.quick > label{font-size:13px;font-weight:600}
+.quickrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:8px}
+.quickrow input,.quickrow select{padding:9px;font-size:16px}
+@media (max-width:600px){.quickrow{grid-template-columns:minmax(0,1fr) auto}.quickrow select{grid-column:1/-1}}
 .how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .how div{border-top:3px solid var(--a1);padding-top:10px}
 .how div:nth-child(2){border-color:var(--a2)}
@@ -156,7 +151,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 .sponsor img{display:block;width:320px;max-width:calc(100vw - 32px);height:auto;aspect-ratio:320/50}
 
 @media (max-width:600px){
-  .how,.remind,.manual{grid-template-columns:1fr}
+  .how,.manual{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -187,10 +182,19 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 
     <section id="view-soup" class="stack">
       <div class="daybar"><h2 id="soupDate">Today</h2></div>
+      <form class="quick" id="quickForm" novalidate hidden>
+        <label for="qRest">Seeing a soup board? Post it</label>
+        <div class="quickrow">
+          <select id="qRest" aria-label="Restaurant"></select>
+          <input id="qSoup" type="text" placeholder="Soup today" maxlength="40" autocomplete="off" aria-label="Soup today">
+          <button type="submit" class="btn">Post</button>
+        </div>
+      </form>
       <p class="note" id="soupMsg" hidden></p>
       <div class="filters" id="soupFilters"></div>
       <div class="list" id="soupList"></div>
       <p style="margin:0;font-size:14px">Don't see your lunch spot? <button type="button" id="goAdd" class="link" style="color:var(--ink);font-weight:600">Add a restaurant</button></p>
+      <p style="margin:0;font-size:14px"><a href="remind/?lunch" style="color:var(--ink);font-weight:600">Get a daily lunchtime reminder to check the soups</a></p>
     </section>
 
     <section id="view-post" class="stack" hidden>
@@ -253,25 +257,6 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
             <span class="toast" id="toast" aria-live="polite"></span>
           </div>
         </form>
-      </div>
-
-      <div class="remind">
-        <div>
-          <h2>Daily soup reminder</h2>
-          <p>Coming soon. Each restaurant that signs up gets a nudge every morning. Reply with the soup and it posts.</p>
-          <div class="rfields">
-            <label for="rHow">Send it by</label>
-            <select id="rHow"><option>Text</option><option>Email</option></select>
-            <label for="rTime">At</label>
-            <select id="rTime"><option>9:30 am</option><option>10:00 am</option><option selected>10:30 am</option><option>11:00 am</option></select>
-          </div>
-        </div>
-        <div class="phone" aria-label="Example reminder">
-          <div class="phead" id="pHead"><span data-c="name">Gorge Bowl</span> · 10:30 am</div>
-          <div class="bubble in" id="rMsg">Morning! What's the soup today? Reply with the soup, plus a second soup or specials if you have them.</div>
-          <div class="bubble out">Tomato bisque and split pea. Special is half sandwich + cup</div>
-          <div class="bubble in">Posted! Reply FIX to change it.</div>
-        </div>
       </div>
     </section>
 
@@ -474,8 +459,15 @@ function renderFilters(){
     `<button class="chip" data-f="${esc(t)}" aria-pressed="${t===townFilter}">${t==="all" ? "All" : esc(t)}</button>`).join("");
 }
 
+function renderQuick(){
+  const keep = $("#qRest").value;
+  $("#quickForm").hidden = !restaurants.length;
+  $("#qRest").innerHTML = `<option value="">Pick the restaurant</option>` + restaurants.slice().sort((a,b) => a.name.localeCompare(b.name))
+    .map(r => `<option value="${r.id}">${esc(r.name)}${r.town ? " · " + esc(r.town) : ""}</option>`).join("") + `<option value="__new">+ Add a restaurant</option>`;
+  if ([...$("#qRest").options].some(o => o.value === keep)) $("#qRest").value = keep;
+}
 function renderSoups(){
-  renderFilters();
+  renderFilters(); renderQuick();
   if (!loaded){
     $("#soupList").innerHTML = loadError
       ? `<div class="empty"><h3>Can't load soups right now</h3><p>${esc(loadError)} Check your connection and try again.</p><button type="button" class="btn" data-act="retry">Try again</button></div>`
@@ -510,6 +502,21 @@ function renderSoups(){
   if (editing){ const f = $("#fixIn"); f && f.focus(); }
 }
 
+$("#qRest").addEventListener("change", () => { if ($("#qRest").value === "__new"){ $("#qRest").value = ""; startAdd(); } });
+$("#quickForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const id = $("#qRest").value, soup = $("#qSoup").value.trim();
+  if (!id){ flash("Pick the restaurant first."); $("#qRest").focus(); return; }
+  if (!soup){ flash("Type the soup, then tap Post."); $("#qSoup").focus(); return; }
+  const btn = e.target.querySelector("button"); btn.disabled = true;
+  try {
+    soups[id] = await store.postSoup(id, soup, soups[id] ? soups[id].special : null);
+    saveLocal(); $("#qSoup").value = ""; $("#qRest").value = ""; renderSoups(); flash("Posted. Thanks!");
+  } catch(err){
+    flash(/already posted/.test(err.message) ? "The restaurant already posted today's soup. Tap ✓ on it if it's right." : err.message);
+  }
+  btn.disabled = false;
+});
 $("#soupFilters").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b) return;
   townFilter = b.dataset.f; renderSoups();
@@ -717,16 +724,6 @@ function findWhereIAm(){
   }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
 }
 $("#findMe").addEventListener("click", findWhereIAm);
-
-/* ---------- reminder mockup ---------- */
-function renderReminder(){
-  const email = $("#rHow").value === "Email", t = $("#rTime").value;
-  $("#pHead").textContent = (email ? `Email from ${COMMUNITY.name} · ` : `${COMMUNITY.name} · `) + t;
-  $("#rMsg").textContent = email ? "Subject: What's the soup today? Hit reply with the soup name or attach a photo of the board."
-                                 : "Morning! What's the soup today? Reply with the soup or a photo of the board. Add a second soup or specials too.";
-}
-$("#rHow").addEventListener("change", renderReminder);
-$("#rTime").addEventListener("change", renderReminder);
 
 /* ---------- seasons ----------
    The colors follow the calendar. Each season holds its own palette, and over the last

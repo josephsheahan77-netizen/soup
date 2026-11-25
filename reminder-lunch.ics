@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Local Bowl//Gorge Bowl//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:gorgebowl-daily-lunch-reminder@soupsandtunes
+DTSTAMP:20261126T000000Z
+DTSTART:20261127T111500
+DURATION:PT10M
+RRULE:FREQ=DAILY
+SUMMARY:What's the soup today?
+DESCRIPTION:See today's soups around the Gorge: https://soupsandtunes.com/gorge/
+URL:https://soupsandtunes.com/gorge/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:What's the soup today? Check Gorge Bowl
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

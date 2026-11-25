@@ -26,26 +26,40 @@ a.plain{color:var(--ink);font-weight:600}
 <body>
 <header>
   <img src="../icons/mark.svg" alt="" width="48" height="48">
-  <div><h1>Daily soup reminder</h1><p>A nudge at 9:30 each morning to post your soup on Gorge Bowl.</p></div>
+  <div><h1 id="title">Daily soup reminder</h1><p id="sub">A nudge at 9:30 each morning to post your soup on Gorge Bowl.</p></div>
 </header>
 <main>
   <p>Tap the button for your phone, then tap <b>Add</b> or <b>Save</b>.</p>
   <a class="btn" id="ios" href="../reminder.ics">iPhone: add to my calendar</a>
   <a class="btn" id="android" href="#">Android: add to Google Calendar</a>
-  <small>Want a different time? Change it in your calendar after adding. Want it to stop? Delete the "Post today's soup" event.</small>
+  <small id="other"></small>
+  <small>Want a different time? Change it in your calendar after adding. Want it to stop? Delete the event from your calendar.</small>
   <small>Rather not use the calendar? Set a daily 9:30 alarm in your Clock app instead.</small>
   <p><a class="plain" href="../gorge/">Open Gorge Bowl</a></p>
 </main>
 <script>
-/* Google Calendar "add event" link: daily at 9:30 Pacific, starting tomorrow. */
+/* Two kinds: ?lunch = a lunchtime nudge to check the soups; otherwise a 9:30 nudge for restaurants to post. */
+const lunch = new URLSearchParams(location.search).has("lunch");
+const R = lunch
+  ? {ics: "../reminder-lunch.ics", text: "What's the soup today?", details: "See today's soups around the Gorge: https://soupsandtunes.com/gorge/", start: "T111500", end: "T112500",
+     title: "Daily lunch reminder", sub: "A nudge at 11:15 each day to see what soups are on around the Gorge.",
+     other: '<a class="plain" href="./">Work at a restaurant? Get a 9:30 reminder to post instead.</a>'}
+  : {ics: "../reminder.ics", text: "Post today's soup on Gorge Bowl", details: "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post", start: "T093000", end: "T094000",
+     title: "Daily soup reminder", sub: "A nudge at 9:30 each morning to post your soup on Gorge Bowl.",
+     other: '<a class="plain" href="?lunch">Just here for lunch? Get an 11:15 reminder to check the soups.</a>'};
+document.getElementById("title").textContent = R.title;
+document.getElementById("sub").textContent = R.sub;
+document.getElementById("other").innerHTML = R.other;
+document.getElementById("ios").href = R.ics;
+document.title = R.title + " · Gorge Bowl";
 const t = new Date(Date.now() + 864e5);
 const d = t.toLocaleDateString("en-CA", {timeZone: "America/Los_Angeles"}).replace(/-/g, "");
 const g = new URL("https://calendar.google.com/calendar/render");
 g.search = new URLSearchParams({
   action: "TEMPLATE",
-  text: "Post today's soup on Gorge Bowl",
-  details: "What's in the pot today? Post it here: https://soupsandtunes.com/gorge/#post",
-  dates: d + "T093000/" + d + "T094000",
+  text: R.text,
+  details: R.details,
+  dates: d + R.start + "/" + d + R.end,
   ctz: "America/Los_Angeles",
   recur: "RRULE:FREQ=DAILY"
 }).toString();
