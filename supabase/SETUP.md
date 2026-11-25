@@ -134,3 +134,16 @@ update restaurants set name = 'Trillium Tavern' where name ilike '%trillium%';
 
 Remove a restaurant (and its soups): find its id with
 `select id, name, town from restaurants order by name;` then `delete from restaurants where id = '...';`
+
+# Visitor counts (anonymous)
+
+Counts how many phones open the app each day, how many are new, and total views. No names or IP
+addresses: each phone gets a random ID stored only on that phone. Only you can see the numbers.
+
+**Setup:** in Supabase, **SQL Editor → New query**, paste everything in [`visits.sql`](visits.sql), click **Run**.
+
+**See your numbers** (last two weeks):
+```sql
+select * from daily_stats order by day desc limit 14;
+```
+Columns: `visitors` (different phones that day), `new_visitors` (first time ever), `views` (total opens), `soups_posted`.

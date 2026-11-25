@@ -318,6 +318,7 @@ body.has-sponsor{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
         <h2>The house rules</h2>
         <ul class="facts">
           <li>No comments, no reviews, no ratings. Just soup.</li>
+          <li>We count visits anonymously, so we know how many people check the soups. No names, no ads tracking you.</li>
           <li>Soups clear every night. The colors follow the seasons.</li>
         </ul>
       </div>
@@ -860,6 +861,21 @@ window.addEventListener("hashchange", () => {
   if (location.hash === "#howto") showView("howto");
 });
 if (!readLinkInHash() && owner) checkOwnerKey(owner.key, false);   // quietly re-check, in case Joe made a new link
+/* Anonymous visit count: a random ID kept only on this phone, no names, no tracking elsewhere. */
+function logVisit(){
+  if (!REMOTE) return;
+  let id = load("gb.device", null);
+  if (!id){
+    id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+    save("gb.device", id);
+  }
+  api("rpc/log_visit", {p_device: id}).catch(() => {});
+}
+logVisit();
+document.addEventListener("visibilitychange", () => {   // count a return visit after 30+ minutes away
+  if (document.hidden){ logVisit.away = Date.now(); return; }
+  if (logVisit.away && Date.now() - logVisit.away > 30 * 60000) logVisit();
+});
 if (REMOTE){
   refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, 60000);
